@@ -1,0 +1,2 @@
+# homeandprayer-site
+daily scripture
