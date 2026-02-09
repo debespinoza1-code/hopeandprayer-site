@@ -1,2 +1,2 @@
-# homeandprayer-site
+# hopeandprayer-site
 daily scripture
