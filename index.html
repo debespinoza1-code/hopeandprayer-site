@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hope — Gentle Catholic Scripture & Prayer</title>
+<meta name="description" content="Daily Catholic Scripture and gentle spiritual guidance for those struggling with faith.">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg">
+
+  <div class="sunrise">
+    <div class="sun"></div>
+    <div class="rays"></div>
+  </div>
+
+  <div class="candle">
+    <div class="candle__glow"></div>
+    <div class="candle__flame"></div>
+    <div class="candle__wick"></div>
+    <div class="candle__body"></div>
+    <div class="candle__base"></div>
+  </div>
+
+  <div class="bg__vignette"></div>
+  <div class="bg__grain"></div>
+
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <h1 class="brand__title">Hope</h1>
+    <div class="brand__subtitle">Gentle Catholic Scripture & Prayer</div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="panel">
+    <p class="lead">
+      A quiet place for those who are struggling, doubting, weary, or searching.
+      Here, Scripture is read slowly, prayerfully, and with compassion.
+    </p>
+  </section>
+
+  <!-- DAILY READING -->
+  <section class="panel">
+    <div class="panel__top">
+      <h2>Today’s Reading</h2>
+      <div class="meta">Catholic Bible</div>
+    </div>
+
+    <div class="reading">
+      <div class="reading__source">Gospel</div>
+      <div class="reading__title">Matthew 11:28–30</div>
+
+      <p class="reading__snippet">
+        “Come to me, all you who labor and are burdened, and I will give you rest…”
+      </p>
+
+      <a class="link" href="https://laudateapp.com/" target="_blank">
+        Open in Laudate App
+      </a>
+    </div>
+  </section>
+
+  <!-- YOUR REFLECTION -->
+  <section class="panel">
+    <h2>Prayerful Reflection</h2>
+
+    <p class="lead">
+      (You may write your reflection here in your editor before publishing,
+      or later we can connect this to a CMS.)
+    </p>
+
+    <textarea class="field area" placeholder="Write your reflection here..."></textarea>
+  </section>
+
+  <!-- PRAYER REQUEST -->
+  <section class="panel">
+    <h2>Would You Like Me to Pray For You?</h2>
+
+    <p class="lead">
+      You may share your prayer request below. I will hold you in prayer.
+    </p>
+
+    <!-- NETLIFY FORM -->
+    <form name="prayer" method="POST" data-netlify="true">
+      <input type="hidden" name="form-name" value="prayer">
+
+      <label class="label">Your Name (optional)</label>
+      <input class="field" type="text" name="name">
+
+      <label class="label">Your Email (optional)</label>
+      <input class="field" type="email" name="email">
+
+      <label class="label">Prayer Request</label>
+      <textarea class="field area" name="request"></textarea>
+
+      <button class="btn" type="submit">Send Prayer Request</button>
+    </form>
+
+    <div class="note">
+      Your request is private and received with care.
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="wrap footer">
+  <div class="footer__small">
+    © Hope — A quiet place of prayer
+  </div>
+
+  <div class="footer__small">
+    Catholic Scripture • Gentle Guidance
+  </div>
+</footer>
+
+</body>
+</html>
