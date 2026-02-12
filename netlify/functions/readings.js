@@ -1,29 +1,50 @@
 exports.handler = async function () {
   try {
-    // USCCB provides a JSON feed used by their site
-    const url = "https://bible.usccb.org/api/daily-readings";
+    const url = "https://bible.usccb.org/daily-bible-reading";
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "HopeSiteBot/1.0",
+        "Accept": "text/html"
+      }
+    });
+
     if (!res.ok) {
-      return json(502, { error: "USCCB API failed" });
+      return json(502, { error: "USCCB fetch failed" });
     }
 
-    const data = await res.json();
+    const html = await res.text();
+
+    // Extract date
+    const dateMatch = html.match(/<h1[^>]*class="daily-reading-date"[^>]*>(.*?)<\/h1>/i);
+    const dateLabel = dateMatch ? clean(dateMatch[1]) : "Today";
 
     const items = [];
 
-    if (data.readings) {
-      data.readings.forEach(r => {
-        items.push({
-          kind: r.type,          // Reading I, Responsorial Psalm, Gospel
-          reference: r.citation, // Scripture reference
-          excerpt: r.text.slice(0, 240) + "…"
-        });
-      });
+    // Match each reading block
+    const sectionRegex =
+      /<h3[^>]*>(Reading I|Responsorial Psalm|Gospel)<\/h3>[\s\S]*?<div class="bible-reading">([\s\S]*?)<\/div>/gi;
+
+    let match;
+    while ((match = sectionRegex.exec(html)) !== null) {
+      const kind = clean(match[1]);
+
+      const block = match[2];
+
+      const refMatch = block.match(/<a[^>]*>(.*?)<\/a>/i);
+      const reference = refMatch ? clean(refMatch[1]) : "";
+
+      const textMatch = block.match(/<p[^>]*>(.*?)<\/p>/i);
+      const excerptRaw = textMatch ? clean(strip(textMatch[1])) : "";
+      const excerpt = excerptRaw
+        ? excerptRaw.slice(0, 260) + (excerptRaw.length > 260 ? "…" : "")
+        : "";
+
+      items.push({ kind, reference, excerpt });
     }
 
     return json(200, {
-      dateLabel: data.date || "Today",
+      dateLabel,
       summary: "Today’s Catholic liturgy readings (NABRE).",
       items
     });
@@ -39,4 +60,18 @@ function json(statusCode, obj) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(obj)
   };
+}
+
+function strip(s) {
+  return String(s || "").replace(/<[^>]+>/g, "");
+}
+
+function clean(s) {
+  return strip(s)
+    .replace(/\s+/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .trim();
 }
