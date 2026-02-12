@@ -21,7 +21,7 @@ exports.handler = async function () {
 
     const items = [];
     const blockRegex =
-      /<(h2|h3)[^>]*>(Reading I|Reading II|Responsorial Psalm|Gospel|Alleluia|Sequence|Optional Memorial|Memorial|Saint[^<]*)<\/\1>[\s\S]*?(?=<(h2|h3)[^>]*>|<\/main>)/gi;
+  /<(h2|h3)[^>]*>(Reading I|Responsorial Psalm|Gospel)<\/\1>[\s\S]*?(?=<(h2|h3)[^>]*>|<\/main>)/gi;
 
     let m;
     while ((m = blockRegex.exec(html)) !== null) {
