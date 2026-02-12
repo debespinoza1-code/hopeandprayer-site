@@ -1,107 +1,80 @@
-// Hope — app.js (minimal)
+(function () {
+  const $ = (id) => document.getElementById(id);
 
-const LS = {
-  guidanceTitle: "hope.guidanceTitle",
-  guidanceBody: "hope.guidanceBody",
-  prayerRequests: "hope.prayerRequests"
-};
-
-function $(id){ return document.getElementById(id); }
-
-function formatDate(d){
-  return d.toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
-}
-
-function setText(id, value){
-  const el = $(id);
-  if (el) el.textContent = value;
-}
-
-function setLink(id, href){
-  const el = $(id);
-  if (el) el.href = href;
-}
-
-async function loadReadings(){
-  // Local preview note stays visible; on Netlify we’ll replace content.
-  setText("readingTitle", "Loading today’s readings…");
-  setText("readingSnippet", "Please wait.");
-  setLink("readingLink", "https://bible.usccb.org/");
-
-  const res = await fetch("/api/readings", { cache: "no-store" });
-  if (!res.ok) throw new Error("Feed not available yet (deploy to Netlify).");
-
-  const data = await res.json();
-  const item = data.items?.[0];
-  if (!item) throw new Error("No readings found.");
-
-  setText("readingTitle", item.title || "USCCB Daily Readings");
-  setText("readingSnippet", (item.descriptionText || "").slice(0, 420) + "…");
-  setLink("readingLink", item.link || "https://bible.usccb.org/");
-
-  const note = $("readingNote");
-  if (note) note.style.display = "none";
-}
-
-function loadGuidance(){
-  $("guidanceTitle").value = localStorage.getItem(LS.guidanceTitle) || "";
-  $("guidanceBody").value = localStorage.getItem(LS.guidanceBody) || "";
-}
-function saveGuidance(){
-  localStorage.setItem(LS.guidanceTitle, $("guidanceTitle").value || "");
-  localStorage.setItem(LS.guidanceBody, $("guidanceBody").value || "");
-}
-
-let t = null;
-function autosave(){
-  clearTimeout(t);
-  t = setTimeout(saveGuidance, 350);
-}
-
-function loadPrayerRequests(){
-  try{
-    return JSON.parse(localStorage.getItem(LS.prayerRequests) || "[]");
-  }catch{
-    return [];
-  }
-}
-function savePrayerRequests(arr){
-  localStorage.setItem(LS.prayerRequests, JSON.stringify(arr));
-}
-
-function saveRequest(){
-  const name = ($("name").value || "Anonymous").trim().slice(0, 60);
-  const contact = ($("contact").value || "").trim().slice(0, 120);
-  const request = ($("request").value || "").trim();
-
-  if (!request){
-    alert("Please write a prayer request first.");
-    return;
+  function esc(s) {
+    return String(s || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
-  const arr = loadPrayerRequests();
-  arr.push({ name, contact, request, time: new Date().toISOString() });
-  savePrayerRequests(arr);
+  async function loadReflection() {
+    const box = $("reflectionContainer");
+    if (!box) return;
 
-  $("request").value = "";
-  alert("Saved. When you’re ready, we can make this send to you automatically (Netlify Forms).");
-}
+    try {
+      const res = await fetch("/content/today.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("Reflection fetch failed: " + res.status);
+      const data = await res.json();
 
-(function init(){
-  const now = new Date();
-  setText("todayDate", formatDate(now));
-  setText("yearNow", String(now.getFullYear()));
+      const opening = data.opening ? `<p class="lead">${esc(data.opening)}</p>` : "";
+      const body = data.body
+        ? `<p>${esc(data.body).replace(/\n\n+/g, "</p><p>")}</p>`
+        : `<p class="lead">No reflection posted yet.</p>`;
+      const prayer = data.prayer
+        ? `<div class="softline"></div><p class="lead"><strong>Prayer:</strong> ${esc(data.prayer)}</p>`
+        : "";
 
-  loadGuidance();
-  $("guidanceTitle").addEventListener("input", autosave);
-  $("guidanceBody").addEventListener("input", autosave);
+      box.innerHTML = opening + body + prayer;
+    } catch (e) {
+      console.error(e);
+      box.innerHTML = `<p class="lead">Could not load today’s reflection.</p>`;
+    }
+  }
 
-  $("saveRequestBtn").addEventListener("click", saveRequest);
+  async function loadReadings() {
+    const dateEl = $("readingsDate");
+    const introEl = $("readingsIntro");
+    const container = $("readingsContainer");
 
-  loadReadings().catch(err => {
-    // Don’t scare the user; show a graceful local-preview message.
-    setText("readingTitle", "Today’s readings will appear after you deploy to Netlify.");
-    setText("readingSnippet", "Right now you’re previewing locally. The design is correct — the feed is server-only.");
-    setLink("readingLink", "https://bible.usccb.org/");
+    if (!container) return;
+
+    try {
+      const res = await fetch("/.netlify/functions/readings", { cache: "no-store" });
+      if (!res.ok) throw new Error("Readings fetch failed: " + res.status);
+      const data = await res.json();
+
+      if (dateEl) dateEl.textContent = data.dateLabel || "Today";
+      if (introEl) introEl.textContent = data.summary || "Today’s Catholic liturgy readings (NABRE).";
+
+      container.innerHTML = "";
+
+      (data.items || []).forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "reading";
+        div.innerHTML = `
+          <div class="reading__source">${esc(item.kind || "")}</div>
+          <div class="reading__title">${esc(item.reference || "")}</div>
+          ${item.excerpt ? `<p class="reading__snippet">${esc(item.excerpt)}</p>` : ""}
+        `;
+        container.appendChild(div);
+      });
+
+      if (!data.items || data.items.length === 0) {
+        container.innerHTML = `<p class="lead">Could not load today’s readings. Please use the USCCB link below.</p>`;
+      }
+    } catch (e) {
+      console.error(e);
+      if (dateEl) dateEl.textContent = "—";
+      if (introEl) introEl.textContent = "Could not load readings right now.";
+      container.innerHTML = `<p class="lead">Please use the USCCB link below.</p>`;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadReflection();
+    loadReadings();
   });
 })();
