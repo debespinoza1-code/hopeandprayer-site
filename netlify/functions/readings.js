@@ -9,53 +9,52 @@ exports.handler = async function () {
       }
     });
 
-    if (!res.ok) return json(502, { error: "USCCB fetch failed", status: res.status });
+    if (!res.ok) return json(502, { error: "USCCB fetch failed" });
 
     const html = await res.text();
 
-    // Date label (best-effort)
     const dateLabel =
       pick(html, /<h1[^>]*class="[^"]*daily-reading-date[^"]*"[^>]*>([\s\S]*?)<\/h1>/i) ||
-      pick(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) ||
       "Today";
 
-    const items = [];
     const kinds = ["Reading I", "Responsorial Psalm", "Gospel"];
+    const items = [];
 
     for (const kind of kinds) {
       const block = extractSection(html, kind);
       if (!block) continue;
 
-      // Citation: first "readings/####.cfm" or "/bible/" link text in the block
-      const reference =
-        clean(pick(block, /<a[^>]*href="[^"]*readings\/[^"]*"[^>]*>([\s\S]*?)<\/a>/i)) ||
-        clean(pick(block, /<a[^>]*href="\/bible\/[^"]*"[^>]*>([\s\S]*?)<\/a>/i)) ||
-        "";
+      // scripture reference = first /bible/ link inside block
+      const reference = clean(
+        pick(block, /<a[^>]*href="\/bible\/[^"]*"[^>]*>([\s\S]*?)<\/a>/i)
+      );
 
-      // Excerpt: first paragraph text in the block
-      const p = pick(block, /<p[^>]*>([\s\S]*?)<\/p>/i);
-      const excerptRaw = clean(strip(p));
-      const excerpt = excerptRaw
-        ? excerptRaw.slice(0, 280) + (excerptRaw.length > 280 ? "…" : "")
-        : "";
+      // scripture excerpt = first real paragraph after reference
+      const paragraph = clean(
+        strip(pick(block, /<p[^>]*>([\s\S]*?)<\/p>/i))
+      );
 
-      // Only push if something meaningful exists
-      if (reference || excerpt) items.push({ kind, reference, excerpt });
+      if (reference || paragraph) {
+        items.push({
+          kind,
+          reference,
+          excerpt: paragraph.slice(0, 260) + (paragraph.length > 260 ? "…" : "")
+        });
+      }
     }
 
     return json(200, {
-      dateLabel: clean(dateLabel) || "Today",
+      dateLabel: clean(dateLabel),
       summary: "Today’s Catholic liturgy readings (NABRE).",
       items
     });
+
   } catch (e) {
     return json(500, { error: "Unexpected error", detail: String(e) });
   }
 };
 
 function extractSection(html, kind) {
-  // Find the heading for the section
-  // USCCB sometimes uses h2/h3 with nested spans, so match loosely.
   const headingRe = new RegExp(
     `<h2[^>]*>[\\s\\S]*?${escapeRe(kind)}[\\s\\S]*?<\\/h2>|<h3[^>]*>[\\s\\S]*?${escapeRe(kind)}[\\s\\S]*?<\\/h3>`,
     "i"
@@ -65,19 +64,15 @@ function extractSection(html, kind) {
   if (!m) return "";
 
   const start = m.index + m[0].length;
-
-  // Take a chunk after heading, stopping at the next h2/h3 (next section)
   const tail = html.slice(start);
-  const nextHeading = tail.search(/<(h2|h3)\b/i);
-  const chunk = nextHeading >= 0 ? tail.slice(0, nextHeading) : tail.slice(0, 12000);
-
-  return chunk;
+  const next = tail.search(/<(h2|h3)\b/i);
+  return next >= 0 ? tail.slice(0, next) : tail.slice(0, 12000);
 }
 
 function json(statusCode, obj) {
   return {
     statusCode,
-    headers: { "Content-Type": "application/json; charset=utf-8" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(obj)
   };
 }
