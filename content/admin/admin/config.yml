@@ -1,0 +1,19 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "reflections"
+    label: "Reflections"
+    folder: "content"
+    create: false
+    slug: "today"
+    extension: "json"
+    format: "json"
+    fields:
+      - { label: "Opening", name: "opening", widget: "string" }
+      - { label: "Body", name: "body", widget: "text" }
+      - { label: "Prayer", name: "prayer", widget: "string", required: false }
