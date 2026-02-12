@@ -1,13 +1,9 @@
 exports.handler = async function () {
   try {
-    // 1) Get the landing page just to find today's .cfm readings page
     const landingUrl = "https://bible.usccb.org/daily-bible-reading";
 
     const landingRes = await fetch(landingUrl, {
-      headers: {
-        "User-Agent": "HopeSiteBot/1.0",
-        "Accept": "text/html",
-      },
+      headers: { "User-Agent": "HopeSiteBot/1.0", "Accept": "text/html" },
     });
     if (!landingRes.ok) return json(502, { error: "USCCB landing fetch failed" });
     const landingHtml = await landingRes.text();
@@ -16,25 +12,15 @@ exports.handler = async function () {
       clean(pick(landingHtml, /<h1[^>]*class="[^"]*daily-reading-date[^"]*"[^>]*>([\s\S]*?)<\/h1>/i)) ||
       "Today";
 
-    // Find the readings .cfm link (example: /bible/readings/021226.cfm)
     const cfmPath = pick(landingHtml, /href="(\/bible\/readings\/\d+\.cfm)"/i);
     if (!cfmPath) {
-      // If USCCB changes markup again, we fail gracefully
-      return json(200, {
-        dateLabel,
-        summary: "Today’s Catholic liturgy readings (NABRE).",
-        items: [],
-        note: "Could not locate today's readings page link.",
-      });
+      return json(200, { dateLabel, summary: "Today’s Catholic liturgy readings (NABRE).", items: [] });
     }
 
-    // 2) Fetch the actual readings page (this has real citations + text)
     const readingsUrl = "https://bible.usccb.org" + cfmPath;
+
     const readingsRes = await fetch(readingsUrl, {
-      headers: {
-        "User-Agent": "HopeSiteBot/1.0",
-        "Accept": "text/html",
-      },
+      headers: { "User-Agent": "HopeSiteBot/1.0", "Accept": "text/html" },
     });
     if (!readingsRes.ok) return json(502, { error: "USCCB readings page fetch failed" });
     const readingsHtml = await readingsRes.text();
@@ -46,12 +32,22 @@ exports.handler = async function () {
       const block = extractSection(readingsHtml, kind);
       if (!block) continue;
 
-      // Citation link: /bible/<book>/... (NOT /bible/readings/...)
-      const reference = clean(
-        pick(block, /<a[^>]*href="\/bible\/(?!readings\/)[^"]*"[^>]*>([\s\S]*?)<\/a>/i)
-      );
+      // Reference can appear as:
+      // - an <h4> line like "Mark 7:14-23"
+      // - an <a> to /bible/<book>/...
+      // We'll try multiple patterns in order.
 
-      // Excerpt: first meaningful paragraph in the block (strip tags)
+      const refFromH4 =
+        pick(block, /<h4[^>]*>\s*<a[^>]*>\s*([\s\S]*?)\s*<\/a>\s*<\/h4>/i) ||
+        pick(block, /<h4[^>]*>\s*([\s\S]*?)\s*<\/h4>/i) ||
+        "";
+
+      const refFromBibleLink =
+        pick(block, /<a[^>]*href="\/bible\/(?!readings\/)[^"]*"[^>]*>([\s\S]*?)<\/a>/i) || "";
+
+      const reference = clean(refFromBibleLink || refFromH4);
+
+      // First paragraph text is a solid excerpt
       const paraHtml = pick(block, /<p[^>]*>([\s\S]*?)<\/p>/i);
       const paraText = clean(strip(paraHtml));
 
@@ -59,9 +55,7 @@ exports.handler = async function () {
         ? paraText.slice(0, 280) + (paraText.length > 280 ? "…" : "")
         : "";
 
-      if (reference || excerpt) {
-        items.push({ kind, reference, excerpt });
-      }
+      items.push({ kind, reference, excerpt });
     }
 
     return json(200, {
@@ -76,12 +70,7 @@ exports.handler = async function () {
 };
 
 function extractSection(html, kind) {
-  // USCCB readings page typically uses h3 headings for sections
-  // Match the heading containing the kind, then capture until next h3 (or end).
-  const headingRe = new RegExp(
-    `<h3[^>]*>[\\s\\S]*?${escapeRe(kind)}[\\s\\S]*?<\\/h3>`,
-    "i"
-  );
+  const headingRe = new RegExp(`<h3[^>]*>[\\s\\S]*?${escapeRe(kind)}[\\s\\S]*?<\\/h3>`, "i");
   const m = headingRe.exec(html);
   if (!m) return "";
 
