@@ -3,81 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hope — Daily Catholic Reflection</title>
-  <meta name="description" content="Daily Catholic readings and quiet, prayerful guidance for the struggling." />
-
+  <title>Hope</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css" />
 </head>
-
 <body>
+
   <div class="bg" aria-hidden="true"></div>
+  <div class="bgSharp" aria-hidden="true"></div>
 
-  <header class="hero">
-    <div class="hero__inner">
-      <h1 class="hero__title">HOPE</h1>
-      <p class="hero__subtitle">Daily Catholic reflection and quiet prayer</p>
-      <p class="hero__hint">Scroll for today’s readings, reflection, and prayer requests.</p>
+  <div class="hero">
+    <div class="panel">
+      <div class="panel__top">
+        <div class="title">HOPE</div>
+        <div class="subtitle">Daily Catholic reflection and quiet prayer</div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Hope sections">
+        <button class="tab" role="tab" aria-selected="true" data-tab="readings">Readings</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="reflection">Reflection</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="prayer">Prayer</button>
+      </div>
+
+      <div class="panel__body">
+
+        <!-- READINGS -->
+        <section id="tab-readings">
+          <div class="h2" id="readingsDate">Today</div>
+          <div class="meta" id="readingsMeta"></div>
+          <div id="readingsContainer"></div>
+          <div class="actions" id="readingsActions"></div>
+        </section>
+
+        <!-- REFLECTION -->
+        <section id="tab-reflection" style="display:none;">
+          <div class="h2">Today’s Reflection</div>
+          <div class="meta">To edit your reflection: open /admin and edit “today”.</div>
+          <div id="reflectionContainer">
+            <p>Loading reflection…</p>
+          </div>
+          <div class="meta" style="margin-top:12px;">
+            <a class="btnLink" href="/admin/" target="_blank" rel="noreferrer">Open Admin</a>
+          </div>
+        </section>
+
+        <!-- PRAYER -->
+        <section id="tab-prayer" style="display:none;">
+          <div class="h2">Prayer Requests</div>
+          <div class="meta">If you’d like me to pray for you, leave a request below.</div>
+
+          <form name="prayer" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="prayer" />
+            <p class="hp">
+              <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+            </p>
+
+            <label>Your Name (optional)</label>
+            <input type="text" name="name" />
+
+            <label>Your Prayer Request</label>
+            <textarea name="message" required></textarea>
+
+            <button class="btn" type="submit">Submit Prayer Request</button>
+          </form>
+        </section>
+
+      </div>
     </div>
-  </header>
-
-  <main class="wrap">
-
-    <!-- READINGS -->
-    <section class="section">
-      <div class="section__head">
-        <h2 class="section__title" id="readingsDate">Today</h2>
-        <p class="section__meta" id="readingsMeta"></p>
-      </div>
-
-      <div id="readingsContainer"></div>
-
-      <div class="actions" id="readingsActions"></div>
-    </section>
-
-    <!-- REFLECTION -->
-    <section class="section">
-      <div class="section__head">
-        <h2 class="section__title">Today’s Reflection</h2>
-        <p class="section__meta">Written and published by you in the Admin editor.</p>
-      </div>
-
-      <article class="prose" id="reflectionContainer">
-        <p>Loading reflection…</p>
-      </article>
-
-      <!-- Optional: admin link shown only to you (you can remove) -->
-      <p class="adminLink"><a href="/admin/" target="_blank" rel="noreferrer">Open Admin</a></p>
-    </section>
-
-    <!-- PRAYER REQUESTS -->
-    <section class="section">
-      <div class="section__head">
-        <h2 class="section__title">Prayer Requests</h2>
-        <p class="section__meta">If you’d like me to pray for you, you may leave a request below.</p>
-      </div>
-
-      <form class="form" name="prayer" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="prayer" />
-
-        <p class="hp">
-          <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
-        </p>
-
-        <label class="label">Your Name (optional)</label>
-        <input class="field" type="text" name="name" autocomplete="name" />
-
-        <label class="label">Your Prayer Request</label>
-        <textarea class="field" name="message" required></textarea>
-
-        <button class="btn" type="submit">Submit Prayer Request</button>
-      </form>
-    </section>
-
-    <footer class="footer">
-      <p>© Hope — A quiet place for faith.</p>
-    </footer>
-  </main>
+  </div>
 
   <script src="./app.js"></script>
 </body>
