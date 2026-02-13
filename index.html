@@ -1,77 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hope</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hope</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-  <div class="bg" aria-hidden="true"></div>
-  <div class="bgSharp" aria-hidden="true"></div>
+<div class="bg"></div>
 
-  <div class="hero">
-    <div class="panel">
-      <div class="panel__top">
-        <div class="title">HOPE</div>
-        <div class="subtitle">Daily Catholic reflection and quiet prayer</div>
-      </div>
+<header class="hero">
+  <h1>HOPE</h1>
+  <p>Daily Catholic reflection and prayer</p>
+</header>
 
-      <div class="tabs" role="tablist" aria-label="Hope sections">
-        <button class="tab" role="tab" aria-selected="true" data-tab="readings">Readings</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="reflection">Reflection</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="prayer">Prayer</button>
-      </div>
+<main>
 
-      <div class="panel__body">
+<section>
+<h2 id="readingsDate">Today</h2>
+<div id="readingsContainer"></div>
+<div id="readingsActions"></div>
+</section>
 
-        <!-- READINGS -->
-        <section id="tab-readings">
-          <div class="h2" id="readingsDate">Today</div>
-          <div class="meta" id="readingsMeta"></div>
-          <div id="readingsContainer"></div>
-          <div class="actions" id="readingsActions"></div>
-        </section>
+<section>
+<h2>Today’s Reflection</h2>
+<div id="reflectionContainer">Loading reflection…</div>
+<p><a href="/admin/">Edit Reflection</a></p>
+</section>
 
-        <!-- REFLECTION -->
-        <section id="tab-reflection" style="display:none;">
-          <div class="h2">Today’s Reflection</div>
-          <div class="meta">To edit your reflection: open /admin and edit “today”.</div>
-          <div id="reflectionContainer">
-            <p>Loading reflection…</p>
-          </div>
-          <div class="meta" style="margin-top:12px;">
-            <a class="btnLink" href="/admin/" target="_blank" rel="noreferrer">Open Admin</a>
-          </div>
-        </section>
+<section>
+<h2>Prayer Requests</h2>
 
-        <!-- PRAYER -->
-        <section id="tab-prayer" style="display:none;">
-          <div class="h2">Prayer Requests</div>
-          <div class="meta">If you’d like me to pray for you, leave a request below.</div>
+<form name="prayer" method="POST" data-netlify="true">
+<input type="hidden" name="form-name" value="prayer">
 
-          <form name="prayer" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-            <input type="hidden" name="form-name" value="prayer" />
-            <p class="hp">
-              <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
-            </p>
+<label>Name (optional)</label>
+<input type="text" name="name">
 
-            <label>Your Name (optional)</label>
-            <input type="text" name="name" />
+<label>Prayer Request</label>
+<textarea name="message" required></textarea>
 
-            <label>Your Prayer Request</label>
-            <textarea name="message" required></textarea>
+<button type="submit">Submit Prayer Request</button>
+</form>
 
-            <button class="btn" type="submit">Submit Prayer Request</button>
-          </form>
-        </section>
+</section>
 
-      </div>
-    </div>
-  </div>
+<footer>
+<p>© Hope</p>
+</footer>
 
-  <script src="./app.js"></script>
+</main>
+
+<script src="app.js"></script>
 </body>
 </html>
