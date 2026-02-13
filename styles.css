@@ -1,216 +1,140 @@
 :root{
-  --bg:#050608;
   --cream:#f7f3ea;
-  --muted:rgba(247,243,234,.74);
+  --muted:rgba(247,243,234,.75);
   --gold:#ffd79a;
-  --panel:rgba(0,0,0,.38);
-  --stroke:rgba(255,255,255,.14);
-  --shadow:rgba(0,0,0,.65);
+  --shadow:rgba(0,0,0,.7);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 
 body{
-  background: var(--bg);
-  color: var(--cream);
-  font-family: "Cormorant Garamond","Times New Roman",serif;
-  line-height: 1.75;
-  overflow-x: hidden;
+  font-family:"Cormorant Garamond","Times New Roman",serif;
+  color:var(--cream);
+  background:#000;
+  line-height:1.8;
 }
 
-/* FULL-VIEW background solution:
-   - Layer 1: blurred cover (fills screen)
-   - Layer 2: sharp contain (shows whole cross + kneeling woman)
-*/
+/* SINGLE FULL BACKGROUND IMAGE */
 .bg{
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background:
-    linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,.55) 55%, rgba(0,0,0,.78)),
-    url("./assets/background.jpg") center/cover no-repeat;
-  filter: blur(14px) saturate(1.05) brightness(.95);
-  transform: scale(1.06);
-}
-
-/* Sharp full image on top */
-.bgSharp{
   position:fixed;
   inset:0;
   z-index:-1;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,235,190,.14), rgba(0,0,0,0) 60%),
+    linear-gradient(to bottom,
+      rgba(0,0,0,.30),
+      rgba(0,0,0,.55)
+    ),
     url("./assets/background.jpg") center/contain no-repeat;
 }
 
-/* HERO (one-screen experience) */
+/* HERO */
 .hero{
-  min-height: 100vh;
+  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding: 28px 16px;
-}
-
-/* Content panel (readable, not “boxes everywhere”) */
-.panel{
-  width: min(980px, 96vw);
-  background: var(--panel);
-  border: 1px solid var(--stroke);
-  border-radius: 18px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 18px 60px var(--shadow);
-  overflow:hidden;
-}
-
-.panel__top{
-  padding: 26px 22px 18px;
   text-align:center;
+  padding:40px 18px;
 }
 
-.title{
-  color: var(--gold);
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
-  line-height: 1.1;
+.hero h1{
+  font-size:clamp(3rem,6vw,5rem);
+  letter-spacing:.25em;
+  color:var(--gold);
+  text-shadow:0 10px 40px var(--shadow);
 }
 
-.subtitle{
-  margin-top: 10px;
-  color: var(--muted);
-  font-style: italic;
-  font-size: 1.15rem;
+.hero p{
+  margin-top:14px;
+  font-style:italic;
+  color:var(--muted);
+  font-size:1.15rem;
+  text-shadow:0 10px 40px var(--shadow);
 }
 
-/* Tabs */
-.tabs{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding: 14px 18px 18px;
-  border-top: 1px solid rgba(255,255,255,.10);
+/* CONTENT */
+main{
+  max-width:850px;
+  margin:0 auto;
+  padding:60px 18px 100px;
 }
 
-.tab{
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: .88rem;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,215,154,.26);
-  background: rgba(255,215,154,.08);
-  color: var(--gold);
-  cursor:pointer;
+section{
+  margin-top:70px;
 }
 
-.tab[aria-selected="true"]{
-  background: rgba(255,215,154,.18);
-  border-color: rgba(255,215,154,.48);
-  color: #fff;
-}
-
-/* Panel body area stays within viewport */
-.panel__body{
-  padding: 18px 22px 22px;
-  max-height: min(58vh, 520px);
-  overflow:auto;
-}
-
-/* Sections inside */
-.h2{
-  color: var(--gold);
-  font-size: 1.6rem;
-  margin-bottom: 10px;
-}
-
-.meta{
-  color: var(--muted);
-  margin-bottom: 14px;
-  font-size: .98rem;
+h2{
+  color:var(--gold);
+  font-size:1.8rem;
+  margin-bottom:14px;
+  text-shadow:0 10px 30px var(--shadow);
 }
 
 .reading{
-  margin: 16px 0;
-  padding: 14px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
+  margin-bottom:28px;
 }
 
 .kind{
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .78rem;
-  color: rgba(247,243,234,.68);
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:.75rem;
+  color:var(--muted);
 }
 
 .ref{
-  margin-top: 6px;
-  color: var(--gold);
-  font-size: 1.12rem;
+  color:var(--gold);
+  margin:6px 0;
 }
 
 .excerpt{
-  margin-top: 10px;
-  color: rgba(247,243,234,.95);
+  color:var(--cream);
 }
 
-.actions{
-  margin-top: 18px;
-  display:flex;
-  justify-content:center;
-}
-
-.btnLink, button.btn{
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+a.button{
   display:inline-block;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,215,154,.34);
-  background: rgba(255,215,154,.10);
-  color: var(--gold);
+  margin-top:18px;
+  padding:10px 18px;
+  border-radius:999px;
+  border:1px solid rgba(255,215,154,.4);
+  color:var(--gold);
   text-decoration:none;
-  font-size: .9rem;
-  letter-spacing:.08em;
 }
 
-.btnLink:hover, button.btn:hover{
-  background: rgba(255,215,154,.18);
-  border-color: rgba(255,215,154,.55);
-  color:#fff;
+a.button:hover{
+  background:rgba(255,215,154,.15);
 }
 
-/* Form */
+/* FORM */
 label{
   display:block;
-  margin: 12px 0 6px;
-  color: var(--muted);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: .9rem;
+  margin:12px 0 6px;
+  color:var(--muted);
 }
 
-input, textarea{
+input,textarea{
   width:100%;
-  padding: 13px 13px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.18);
-  color: var(--cream);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: 1rem;
+  padding:12px;
+  background:rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.3);
+  color:#fff;
+  border-radius:8px;
 }
 
-textarea{min-height:140px;resize:vertical}
-input:focus, textarea:focus{outline:none;border-color: rgba(255,215,154,.55)}
+textarea{min-height:140px}
 
-.hp{display:none}
+button{
+  margin-top:14px;
+  padding:12px 22px;
+  border:none;
+  border-radius:999px;
+  background:var(--gold);
+  color:#000;
+  font-weight:bold;
+}
 
-@media (max-width:600px){
-  .panel__top{padding:22px 16px 14px}
-  .panel__body{padding:16px 16px 18px; max-height: 62vh;}
+footer{
+  text-align:center;
+  margin-top:90px;
+  color:var(--muted);
 }
