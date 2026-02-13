@@ -1,110 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hope — Gentle Catholic Scripture & Prayer</title>
-  <meta name="description" content="Daily Catholic Scripture and gentle spiritual guidance for those struggling with faith.">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hope</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
+
 <div class="bg"></div>
-  <!-- BACKGROUND -->
-  <div class="bg">
-    <div class="sunrise">
-      <div class="sun"></div>
-      <div class="rays"></div>
+
+<header class="header">
+  <h1 class="brand__title">Hope</h1>
+  <p class="brand__subtitle">Daily Catholic reflection and quiet prayer</p>
+</header>
+
+<div class="wrap">
+
+  <!-- DAILY READINGS -->
+  <section>
+    <h2 id="readingsDate">Today</h2>
+    <p id="readingsIntro"></p>
+    <div id="readingsContainer"></div>
+  </section>
+
+  <!-- REFLECTION -->
+  <section>
+    <h2>Today’s Reflection</h2>
+    <div id="reflectionContainer">
+      <p class="lead">Loading reflection...</p>
     </div>
+  </section>
 
-    <div class="candle">
-      <div class="candle__glow"></div>
-      <div class="candle__flame"></div>
-      <div class="candle__wick"></div>
-      <div class="candle__body"></div>
-      <div class="candle__base"></div>
-    </div>
+  <!-- PRAYER REQUEST FORM -->
+  <section>
+    <h2>Prayer Requests</h2>
+    <p class="lead">If you would like me to pray for you, you may leave your request here.</p>
 
-    <div class="bg__vignette"></div>
-    <div class="bg__grain"></div>
-  </div>
+    <form name="prayer" method="POST" data-netlify="true" netlify-honeypot="bot-field">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="brand">
-      <h1 class="brand__title">Hope</h1>
-      <div class="brand__subtitle">Daily Scripture • Gentle Catholic Guidance • Prayer</div>
-    </div>
-  </header>
+      <!-- Required hidden input for Netlify -->
+      <input type="hidden" name="form-name" value="prayer" />
 
-  <main class="wrap">
-
-    <section class="panel">
-      <p class="lead">
-        A quiet place for those who are struggling, doubting, weary, or searching.
-        Scripture is read slowly and with compassion. You are not alone.
+      <!-- Honeypot (spam protection) -->
+      <p style="display:none">
+        <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
       </p>
-    </section>
 
-    <!-- READINGS -->
-    <section class="panel">
-      <div class="panel__top">
-        <h2>Today’s Readings</h2>
-        <div class="meta" id="readingsDate">Loading…</div>
-      </div>
+      <label>Your Name (optional)</label>
+      <input type="text" name="name" />
 
-      <p class="lead" id="readingsIntro">Loading today’s readings…</p>
+      <label>Your Prayer Request</label>
+      <textarea name="message" required></textarea>
 
-      <div id="readingsContainer"></div>
+      <button type="submit">Submit Prayer Request</button>
+    </form>
+  </section>
 
-      <div class="softline"></div>
-
-     
-      <div class="note">NABRE daily lectionary readings.</div>
-    </section>
-
-    <!-- REFLECTION -->
-    <section class="panel">
-      <div class="panel__top">
-        <h2>Today’s Reflection</h2>
-      
-      </div>
-
-      <div id="reflectionContainer">
-        <p class="lead">Loading reflection…</p>
-      </div>
-    </section>
-
-    <!-- PRAYER REQUEST -->
-    <section class="panel">
-      <h2>Would You Like Me to Pray For You?</h2>
-      <p class="lead">You may share a prayer request below. I will hold you in prayer.</p>
-
-      <form name="prayer" method="POST" data-netlify="true">
-        <input type="hidden" name="form-name" value="prayer">
-
-        <label class="label">Your Name (optional)</label>
-        <input class="field" type="text" name="name">
-
-        <label class="label">Your Email (optional)</label>
-        <input class="field" type="email" name="email">
-
-        <label class="label">Prayer Request</label>
-        <textarea class="field area" name="request"></textarea>
-
-        <button class="btn" type="submit">Send Prayer Request</button>
-      </form>
-
-      <div class="note">Your request is private and received with care.</div>
-    </section>
-
-  </main>
-
-  <footer class="wrap footer">
-    <div class="footer__small">© Hope</div>
-    <div class="footer__small">“Lord, increase our faith.”</div>
+  <footer class="footer">
+    © Hope — A quiet place for faith.
   </footer>
 
-  <script src="app.js" defer></script>
+</div>
+
+<script src="app.js"></script>
+
 </body>
 </html>
