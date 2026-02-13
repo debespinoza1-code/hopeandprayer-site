@@ -1,217 +1,202 @@
 :root{
   --bg:#050608;
   --cream:#f7f3ea;
-  --muted:rgba(247,243,234,.75);
+  --muted:rgba(247,243,234,.74);
   --gold:#ffd79a;
-  --shadow:rgba(0,0,0,.6);
-
-  --panel:rgba(255,255,255,.06);
-  --stroke:rgba(255,255,255,.16);
+  --panel:rgba(0,0,0,.38);
+  --stroke:rgba(255,255,255,.14);
+  --shadow:rgba(0,0,0,.65);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 
 body{
-  background:var(--bg);
-  color:var(--cream);
-  overflow-x:hidden;
-  line-height:1.85;
-  font-family:"Cormorant Garamond","Times New Roman",serif;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: "Cormorant Garamond","Times New Roman",serif;
+  line-height: 1.75;
+  overflow-x: hidden;
 }
 
-/* Fullscreen background image */
+/* FULL-VIEW background solution:
+   - Layer 1: blurred cover (fills screen)
+   - Layer 2: sharp contain (shows whole cross + kneeling woman)
+*/
 .bg{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,.55) 55%, rgba(0,0,0,.78)),
+    url("./assets/background.jpg") center/cover no-repeat;
+  filter: blur(14px) saturate(1.05) brightness(.95);
+  transform: scale(1.06);
+}
+
+/* Sharp full image on top */
+.bgSharp{
   position:fixed;
   inset:0;
   z-index:-1;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,235,190,.16), rgba(0,0,0,0) 60%),
-    linear-gradient(to bottom, rgba(0,0,0,.20), rgba(0,0,0,.52) 55%, rgba(0,0,0,.78)),
-    url("./assets/background.jpg") 50% 70% / cover no-repeat;
+    radial-gradient(circle at 50% 18%, rgba(255,235,190,.14), rgba(0,0,0,0) 60%),
+    url("./assets/background.jpg") center/contain no-repeat;
 }
 
-/* HERO */
+/* HERO (one-screen experience) */
 .hero{
-  min-height:100vh;
+  min-height: 100vh;
   display:flex;
   align-items:center;
   justify-content:center;
+  padding: 28px 16px;
+}
+
+/* Content panel (readable, not “boxes everywhere”) */
+.panel{
+  width: min(980px, 96vw);
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 60px var(--shadow);
+  overflow:hidden;
+}
+
+.panel__top{
+  padding: 26px 22px 18px;
   text-align:center;
-  padding: 0 18px;
 }
 
-.hero__inner{
-  max-width: 920px;
-}
-
-.hero__title{
-  font-size:clamp(3.2rem, 7vw, 5.4rem);
-  letter-spacing:.24em;
-  text-transform:uppercase;
-  color:var(--gold);
-  line-height:1.1;
-  text-shadow:0 14px 44px var(--shadow);
-}
-
-.hero__subtitle{
-  margin-top:14px;
-  font-style:italic;
-  font-size:1.25rem;
-  color:var(--muted);
-  text-shadow:0 14px 44px var(--shadow);
-}
-
-.hero__hint{
-  margin-top:18px;
-  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size:.92rem;
-  color:rgba(247,243,234,.62);
-  letter-spacing:.06em;
-  text-shadow:0 14px 44px var(--shadow);
-}
-
-/* WRAP */
-.wrap{
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 26px 18px 90px;
-}
-
-/* SECTIONS */
-.section{
-  margin-top: 70px;
-}
-
-.section__head{
-  margin-bottom: 18px;
-}
-
-.section__title{
-  font-size: 1.9rem;
+.title{
   color: var(--gold);
-  line-height:1.2;
-  text-shadow:0 12px 36px var(--shadow);
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  line-height: 1.1;
 }
 
-.section__meta{
-  margin-top: 8px;
+.subtitle{
+  margin-top: 10px;
   color: var(--muted);
-  font-size: 1rem;
-  text-shadow:0 12px 36px var(--shadow);
+  font-style: italic;
+  font-size: 1.15rem;
 }
 
-/* Readings */
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(255,255,255,.10);
+}
+
+.tab{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: .88rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,215,154,.26);
+  background: rgba(255,215,154,.08);
+  color: var(--gold);
+  cursor:pointer;
+}
+
+.tab[aria-selected="true"]{
+  background: rgba(255,215,154,.18);
+  border-color: rgba(255,215,154,.48);
+  color: #fff;
+}
+
+/* Panel body area stays within viewport */
+.panel__body{
+  padding: 18px 22px 22px;
+  max-height: min(58vh, 520px);
+  overflow:auto;
+}
+
+/* Sections inside */
+.h2{
+  color: var(--gold);
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.meta{
+  color: var(--muted);
+  margin-bottom: 14px;
+  font-size: .98rem;
+}
+
 .reading{
-  margin-top: 22px;
-  padding: 16px 18px;
+  margin: 16px 0;
+  padding: 14px 14px;
   border-radius: 14px;
-  background: rgba(0,0,0,.14);
   border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,.18);
 }
 
-.reading__kind{
+.kind{
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   text-transform: uppercase;
   letter-spacing: .14em;
   font-size: .78rem;
-  color: rgba(247,243,234,.70);
+  color: rgba(247,243,234,.68);
 }
 
-.reading__ref{
-  margin-top: 8px;
-  font-size: 1.15rem;
+.ref{
+  margin-top: 6px;
   color: var(--gold);
+  font-size: 1.12rem;
 }
 
-.reading__text{
+.excerpt{
   margin-top: 10px;
-  font-size: 1.05rem;
-  color: rgba(247,243,234,.96);
+  color: rgba(247,243,234,.95);
 }
 
 .actions{
   margin-top: 18px;
   display:flex;
-  gap:12px;
-  flex-wrap:wrap;
+  justify-content:center;
 }
 
-.btnLink, .btn{
+.btnLink, button.btn{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   display:inline-block;
   padding: 12px 18px;
   border-radius: 999px;
   border: 1px solid rgba(255,215,154,.34);
   background: rgba(255,215,154,.10);
   color: var(--gold);
-  text-decoration: none;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: .88rem;
-  letter-spacing: .08em;
-  transition: transform .15s ease, background .2s ease, border-color .2s ease;
+  text-decoration:none;
+  font-size: .9rem;
+  letter-spacing:.08em;
 }
 
-.btnLink:hover, .btn:hover{
-  transform: translateY(-1px);
+.btnLink:hover, button.btn:hover{
   background: rgba(255,215,154,.18);
   border-color: rgba(255,215,154,.55);
-  color: #fff;
-}
-
-/* Reflection text */
-.prose{
-  padding: 18px 18px;
-  border-radius: 14px;
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(2px);
-}
-
-.prose p{
-  margin-bottom: 18px;
-  font-size: 1.07rem;
-  text-shadow:0 10px 30px var(--shadow);
-}
-
-.adminLink{
-  margin-top: 12px;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: .9rem;
-}
-
-.adminLink a{
-  color: rgba(255,215,154,.9);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(255,215,154,.35);
-}
-
-.adminLink a:hover{
-  border-bottom-color: rgba(255,215,154,.8);
+  color:#fff;
 }
 
 /* Form */
-.form{
-  margin-top: 10px;
-  padding: 18px 18px;
-  border-radius: 14px;
-  background: rgba(0,0,0,.14);
-  border: 1px solid rgba(255,255,255,.10);
-  backdrop-filter: blur(2px);
-}
-
-.label{
+label{
   display:block;
-  margin: 12px 0 8px;
+  margin: 12px 0 6px;
   color: var(--muted);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-size: .9rem;
-  letter-spacing:.03em;
 }
 
-.field{
+input, textarea{
   width:100%;
-  padding: 14px 14px;
+  padding: 13px 13px;
   border-radius: 12px;
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.18);
@@ -220,23 +205,12 @@ body{
   font-size: 1rem;
 }
 
-textarea.field{
-  min-height: 140px;
-  resize: vertical;
-}
-
-.field:focus{
-  outline:none;
-  border-color: rgba(255,215,154,.60);
-}
+textarea{min-height:140px;resize:vertical}
+input:focus, textarea:focus{outline:none;border-color: rgba(255,215,154,.55)}
 
 .hp{display:none}
 
-/* Footer */
-.footer{
-  margin-top: 90px;
-  text-align:center;
-  color: rgba(247,243,234,.60);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: .9rem;
+@media (max-width:600px){
+  .panel__top{padding:22px 16px 14px}
+  .panel__body{padding:16px 16px 18px; max-height: 62vh;}
 }
