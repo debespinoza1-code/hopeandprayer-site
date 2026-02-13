@@ -27,15 +27,39 @@ body{
 }
 .crossOverlay{
   position: fixed;
-  top: 18px;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(520px, 78vw);
-  opacity: .85;
-  filter: blur(.2px);
-  z-index: -1;
+  width: min(560px, 82vw);
+
+  /* make it feel like it lives inside the light */
+  opacity: .42;
+  mix-blend-mode: soft-light;
+  filter: blur(1.2px) saturate(1.08) brightness(1.08);
+
+  /* soften edges so it dissolves into the scene */
+  -webkit-mask-image: radial-gradient(circle at 50% 55%, rgba(0,0,0,1) 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.35) 62%, rgba(0,0,0,0) 78%);
+  mask-image: radial-gradient(circle at 50% 55%, rgba(0,0,0,1) 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.35) 62%, rgba(0,0,0,0) 78%);
+
   pointer-events: none;
-  mix-blend-mode: screen;
+  z-index: -1;
+}
+
+/* small screens: keep it subtle */
+@media (max-width: 600px){
+  .crossOverlay{
+    top: 6px;
+    width: min(480px, 92vw);
+    opacity: .38;
+  }
+  @keyframes floatCross{
+  from { transform: translateX(-50%) translateY(0); }
+  to   { transform: translateX(-50%) translateY(6px); }
+}
+
+.crossOverlay{
+  animation: floatCross 14s ease-in-out infinite alternate;
+}
 }
 
 @media (max-width: 600px){
