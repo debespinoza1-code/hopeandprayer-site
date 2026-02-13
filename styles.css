@@ -1,6 +1,6 @@
 body{
 margin:0;
-font-family:'Cormorant Garamond', serif;
+font-family:'Playfair Display','Cormorant Garamond',serif;
 color:#f7f3ea;
 background:#000;
 line-height:1.7;
@@ -21,7 +21,7 @@ url("assets/background.jpg") center/contain no-repeat;
 
 /* Hero */
 .hero{
-min-height:100vh;
+min-height:70vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
