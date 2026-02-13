@@ -25,6 +25,26 @@ body{
     linear-gradient(to bottom, rgba(0,0,0,.38), rgba(0,0,0,.62) 55%, rgba(0,0,0,.78)),
     url("./assets/background.jpg") 50% 60% / cover no-repeat;
 }
+.crossOverlay{
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, 78vw);
+  opacity: .85;
+  filter: blur(.2px);
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 600px){
+  .crossOverlay{
+    top: 10px;
+    width: min(420px, 86vw);
+    opacity: .78;
+  }
+}
 .bg::after{
   content:"";
   position:absolute;
