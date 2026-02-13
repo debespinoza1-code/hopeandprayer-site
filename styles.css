@@ -16,19 +16,22 @@ body{
 }
 
 /* Full-screen background photo + overlay for readability */
+/* Full-screen background photo + overlay for readability */
 .bg{
-  position:fixed;
-  inset:0;
-  z-index:-1;
+  position: fixed;
+  inset: 0;
+  z-index: -2;
   background:
-  radial-gradient(circle at 50% 20%, rgba(255,235,190,.20), rgba(0,0,0,0) 60%),
-  linear-gradient(to bottom,
-    rgba(0,0,0,.28) 0%,
-    rgba(0,0,0,.48) 55%,
-    rgba(0,0,0,.62) 100%
-  ),
-  url("./assets/background.jpg") 50% 70% / cover no-repeat;
+    radial-gradient(circle at 50% 20%, rgba(255,235,190,.20), rgba(0,0,0,0) 60%),
+    linear-gradient(to bottom,
+      rgba(0,0,0,.28) 0%,
+      rgba(0,0,0,.48) 55%,
+      rgba(0,0,0,.62) 100%
+    ),
+    url("./assets/background.jpg") 50% 70% / cover no-repeat;
 }
+
+/* Cross overlay blended into the light (no “boxed” feel) */
 .crossOverlay{
   position: fixed;
   top: 6px;
@@ -36,25 +39,29 @@ body{
   transform: translateX(-50%);
   width: min(560px, 82vw);
 
-  /* make it feel like it lives inside the light */
   opacity: .42;
   mix-blend-mode: soft-light;
   filter: blur(1.2px) saturate(1.08) brightness(1.08);
 
-  /* soften edges so it dissolves into the scene */
-   -webkit-mask-image: radial-gradient(circle at 50% 55%,
+  -webkit-mask-image: radial-gradient(circle at 50% 55%,
     rgba(0,0,0,1) 0%,
     rgba(0,0,0,.92) 45%,
     rgba(0,0,0,.55) 75%,
     rgba(0,0,0,0) 92%);
-
   mask-image: radial-gradient(circle at 50% 55%,
     rgba(0,0,0,1) 0%,
     rgba(0,0,0,.92) 45%,
     rgba(0,0,0,.55) 75%,
     rgba(0,0,0,0) 92%);
+
   pointer-events: none;
-  z-index: -1;
+  z-index: -1; /* sits above bg, below content */
+  animation: floatCross 14s ease-in-out infinite alternate;
+}
+
+@keyframes floatCross{
+  from { transform: translateX(-50%) translateY(0); }
+  to   { transform: translateX(-50%) translateY(6px); }
 }
 
 /* small screens: keep it subtle */
@@ -63,22 +70,6 @@ body{
     top: 6px;
     width: min(480px, 92vw);
     opacity: .38;
-  }
-  @keyframes floatCross{
-  from { transform: translateX(-50%) translateY(0); }
-  to   { transform: translateX(-50%) translateY(6px); }
-}
-
-.crossOverlay{
-  animation: floatCross 14s ease-in-out infinite alternate;
-}
-}
-
-@media (max-width: 600px){
-  .crossOverlay{
-    top: 10px;
-    width: min(420px, 86vw);
-    opacity: .78;
   }
 }
 .bg::after{
