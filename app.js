@@ -1,92 +1,75 @@
-(function () {
+(() => {
   const $ = (id) => document.getElementById(id);
 
-  function esc(s) {
-    return String(s || "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
+  const esc = (s) => String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
-  async function loadReflection() {
-    const box = $("reflectionContainer");
-    if (!box) return;
-
-    try {
-      const res = await fetch("/content/today.json", { cache: "no-store" });
-      if (!res.ok) throw new Error("Reflection fetch failed: " + res.status);
-      const data = await res.json();
-
-      const opening = data.opening ? `<p class="lead">${esc(data.opening)}</p>` : "";
-      const body = data.body
-        ? `<p>${esc(data.body).replace(/\n\n+/g, "</p><p>")}</p>`
-        : `<p class="lead">No reflection posted yet.</p>`;
-      const prayer = data.prayer
-        ? `<div class="softline"></div><p class="lead"><strong>Prayer:</strong> ${esc(data.prayer)}</p>`
-        : "";
-
-      box.innerHTML = opening + body + prayer;
-    } catch (e) {
-      console.error(e);
-      box.innerHTML = `<p class="lead">Could not load today’s reflection.</p>`;
-    }
-  }
-
-  async function loadReadings() {
+  async function loadReadings(){
     const dateEl = $("readingsDate");
-    const introEl = $("readingsIntro");
-    const container = $("readingsContainer");
+    const metaEl = $("readingsMeta");
+    const cont = $("readingsContainer");
+    const actions = $("readingsActions");
 
-    if (!container) return;
-
-    try {
+    try{
       const res = await fetch("/.netlify/functions/readings", { cache: "no-store" });
-      if (!res.ok) throw new Error("Readings fetch failed: " + res.status);
+      if(!res.ok) throw new Error("readings http " + res.status);
       const data = await res.json();
 
-      if (dateEl) dateEl.textContent = data.dateLabel || "Today";
-      if (introEl) introEl.textContent = ""; // remove the extra line entirely
+      if(dateEl) dateEl.textContent = data.dateLabel || "Today";
+      if(metaEl) metaEl.textContent = ""; // remove NABRE summary line
+      if(cont) cont.innerHTML = "";
+      if(actions) actions.innerHTML = "";
 
-      container.innerHTML = "";
-
-      const usccbUrl = data.source || "https://bible.usccb.org/daily-bible-reading";
-
-      (data.items || []).forEach((item) => {
+      (data.items || []).forEach(item => {
         const div = document.createElement("div");
         div.className = "reading";
         div.innerHTML = `
-          <div class="reading__source">${esc(item.kind || "")}</div>
-          <div class="reading__title">${esc(item.reference || "")}</div>
-          ${item.excerpt ? `<p class="reading__snippet">${esc(item.excerpt)}</p>` : ""}
+          <div class="reading__kind">${esc(item.kind)}</div>
+          <div class="reading__ref">${esc(item.reference)}</div>
+          <div class="reading__text">${esc(item.excerpt || "")}</div>
         `;
-        container.appendChild(div);
+        cont.appendChild(div);
       });
 
-      // Single button, once, after all readings
-      const actions = document.createElement("div");
-      actions.className = "reading__actions";
-      actions.innerHTML = `
-        <a class="btn" href="${usccbUrl}" target="_blank" rel="noreferrer">Open full readings on USCCB</a>
-      `;
-      container.appendChild(actions);
+      const usccb = data.source || "https://bible.usccb.org/daily-bible-reading";
+      actions.innerHTML = `<a class="btnLink" href="${usccb}" target="_blank" rel="noreferrer">Open full readings on USCCB</a>`;
 
-    } catch (e) {
+    }catch(e){
       console.error(e);
-      if (dateEl) dateEl.textContent = "—";
-      if (introEl) introEl.textContent = "";
-      container.innerHTML = `
-        <p class="lead">Readings are temporarily unavailable.</p>
-        <div class="reading__actions">
-          <a class="btn" href="https://bible.usccb.org/daily-bible-reading" target="_blank" rel="noreferrer">Open full readings on USCCB</a>
-        </div>
-      `;
+      if(dateEl) dateEl.textContent = "Today";
+      if(metaEl) metaEl.textContent = "";
+      if(cont) cont.innerHTML = `<div class="reading"><div class="reading__text">Readings are temporarily unavailable.</div></div>`;
+      if(actions) actions.innerHTML = `<a class="btnLink" href="https://bible.usccb.org/daily-bible-reading" target="_blank" rel="noreferrer">Open full readings on USCCB</a>`;
+    }
+  }
+
+  async function loadReflection(){
+    const box = $("reflectionContainer");
+    if(!box) return;
+
+    try{
+      const res = await fetch("/content/today.json", { cache: "no-store" });
+      if(!res.ok) throw new Error("reflection http " + res.status);
+      const data = await res.json();
+
+      const parts = [];
+      if(data.opening) parts.push(`<p>${esc(data.opening)}</p>`);
+      if(data.body) parts.push(`<p>${esc(data.body).replace(/\n\n+/g, "</p><p>")}</p>`);
+      if(data.prayer) parts.push(`<p><strong>Prayer:</strong> ${esc(data.prayer)}</p>`);
+
+      box.innerHTML = parts.length ? parts.join("") : `<p>No reflection posted yet.</p>`;
+    }catch(e){
+      console.error(e);
+      box.innerHTML = `<p>Could not load today’s reflection.</p>`;
     }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    loadReflection();
     loadReadings();
+    loadReflection();
   });
 })();
