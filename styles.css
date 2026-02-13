@@ -1,300 +1,242 @@
-/* =========================
-   HOPE — FULL STYLES RESET
-   (band-proof + calm typography)
-========================= */
-
 :root{
+  --bg:#050608;
   --cream:#f7f3ea;
-  --muted:rgba(247,243,234,.78);
+  --muted:rgba(247,243,234,.75);
   --gold:#ffd79a;
-  --shadow:rgba(0,0,0,.55);
+  --shadow:rgba(0,0,0,.6);
+
   --panel:rgba(255,255,255,.06);
-  --stroke:rgba(255,255,255,.18);
+  --stroke:rgba(255,255,255,.16);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 
 body{
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  color: var(--cream);
-  line-height: 1.9;
-  background: #050608;
-  overflow-x: hidden;
+  background:var(--bg);
+  color:var(--cream);
+  overflow-x:hidden;
+  line-height:1.85;
+  font-family:"Cormorant Garamond","Times New Roman",serif;
 }
 
-/* Make sure nothing creates bands */
-header, section, .wrap, .header, .footer, #readingsContainer, #reflectionContainer{
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-/* =========================
-   BACKGROUND PHOTO + OVERLAYS
-========================= */
-
+/* Fullscreen background image */
 .bg{
-  position: fixed;
-  inset: 0;
-  z-index: -3;
+  position:fixed;
+  inset:0;
+  z-index:-1;
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,235,190,.18), rgba(0,0,0,0) 60%),
-    linear-gradient(to bottom,
-      rgba(0,0,0,.24) 0%,
-      rgba(0,0,0,.46) 48%,
-      rgba(0,0,0,.70) 100%
-    ),
+    radial-gradient(circle at 50% 18%, rgba(255,235,190,.16), rgba(0,0,0,0) 60%),
+    linear-gradient(to bottom, rgba(0,0,0,.20), rgba(0,0,0,.52) 55%, rgba(0,0,0,.78)),
     url("./assets/background.jpg") 50% 70% / cover no-repeat;
 }
 
-/* Optional very soft film grain (prevents flat “banding” perception) */
-.bg::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 50% 25%, rgba(255,220,160,.10), rgba(0,0,0,0) 55%),
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.012) 0px,
-      rgba(255,255,255,0.012) 1px,
-      rgba(0,0,0,0) 2px,
-      rgba(0,0,0,0) 4px
-    );
-  opacity:.35;
-  mix-blend-mode: overlay;
-}
-
-/* Cross overlay: transparent + integrated (no “box”) */
-.crossOverlay{
-  position: fixed;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, 82vw);
-
-  /* transparent integration */
-  opacity: .34;
-  mix-blend-mode: screen;
-  filter: blur(1.4px) saturate(1.06) brightness(1.10) contrast(.95);
-
-  /* feather the edges aggressively so it never looks pasted */
-  -webkit-mask-image: radial-gradient(circle at 50% 55%,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,.90) 40%,
-    rgba(0,0,0,.35) 70%,
-    rgba(0,0,0,0) 88%);
-  mask-image: radial-gradient(circle at 50% 55%,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,.90) 40%,
-    rgba(0,0,0,.35) 70%,
-    rgba(0,0,0,0) 88%);
-
-  pointer-events:none;
-  z-index: -2;
-}
-
-/* Mobile tuning */
-@media (max-width: 600px){
-  .crossOverlay{
-    top: 6px;
-    width: min(480px, 92vw);
-    opacity: .30;
-  }
-}
-
-/* =========================
-   LAYOUT
-========================= */
-
-.header{
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  text-align: center;
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
   padding: 0 18px;
 }
 
-section{
-  margin-top: 76px;
+.hero__inner{
+  max-width: 920px;
 }
 
-/* =========================
-   TYPE
-========================= */
+.hero__title{
+  font-size:clamp(3.2rem, 7vw, 5.4rem);
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--gold);
+  line-height:1.1;
+  text-shadow:0 14px 44px var(--shadow);
+}
 
-.brand__title{
-  font-size: clamp(3.0rem, 6vw, 4.9rem);
-  letter-spacing: .22em;
-  text-transform: uppercase;
+.hero__subtitle{
+  margin-top:14px;
+  font-style:italic;
+  font-size:1.25rem;
+  color:var(--muted);
+  text-shadow:0 14px 44px var(--shadow);
+}
+
+.hero__hint{
+  margin-top:18px;
+  font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size:.92rem;
+  color:rgba(247,243,234,.62);
+  letter-spacing:.06em;
+  text-shadow:0 14px 44px var(--shadow);
+}
+
+/* WRAP */
+.wrap{
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 26px 18px 90px;
+}
+
+/* SECTIONS */
+.section{
+  margin-top: 70px;
+}
+
+.section__head{
+  margin-bottom: 18px;
+}
+
+.section__title{
+  font-size: 1.9rem;
   color: var(--gold);
-  line-height: 1.15;
-  text-shadow: 0 10px 34px var(--shadow);
+  line-height:1.2;
+  text-shadow:0 12px 36px var(--shadow);
 }
 
-.brand__subtitle{
-  margin-top: 12px;
-  font-style: italic;
+.section__meta{
+  margin-top: 8px;
   color: var(--muted);
-  font-size: 1.15rem;
-  text-shadow: 0 10px 34px var(--shadow);
+  font-size: 1rem;
+  text-shadow:0 12px 36px var(--shadow);
 }
 
-h2{
-  font-size: 1.75rem;
-  line-height: 1.25;
-  color: var(--gold);
-  margin-bottom: 14px;
-  text-shadow: 0 10px 34px var(--shadow);
-}
-
-.lead{
-  font-size: 1.10rem;
-  color: var(--cream);
-  margin-bottom: 20px;
-  text-shadow: 0 10px 34px var(--shadow);
-}
-
-.meta{
-  color: var(--muted);
-  font-size: .95rem;
-  margin-bottom: 10px;
-  text-shadow: 0 10px 34px var(--shadow);
-}
-
-p{
-  margin-bottom: 22px;
-  font-size: 1.06rem;
-  text-shadow: 0 10px 34px var(--shadow);
-}
-
-/* =========================
-   READINGS
-========================= */
-
+/* Readings */
 .reading{
-  margin-bottom: 44px;
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.14);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(2px);
 }
 
-.reading__source{
-  font-size: .86rem;
-  letter-spacing: .14em;
+.reading__kind{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 6px;
+  letter-spacing: .14em;
+  font-size: .78rem;
+  color: rgba(247,243,234,.70);
 }
 
-.reading__title{
-  font-size: 1.14rem;
+.reading__ref{
+  margin-top: 8px;
+  font-size: 1.15rem;
   color: var(--gold);
-  margin-bottom: 10px;
 }
 
-.reading__snippet{
-  opacity: .96;
+.reading__text{
+  margin-top: 10px;
+  font-size: 1.05rem;
+  color: rgba(247,243,234,.96);
 }
 
-/* One button area */
-.reading__actions{
+.actions{
   margin-top: 18px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
-/* =========================
-   BUTTONS
-========================= */
-
-.btn{
+.btnLink, .btn{
   display:inline-block;
-  padding: 11px 18px;
+  padding: 12px 18px;
   border-radius: 999px;
   border: 1px solid rgba(255,215,154,.34);
-  background: rgba(255,215,154,.08);
+  background: rgba(255,215,154,.10);
   color: var(--gold);
   text-decoration: none;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-size: .88rem;
   letter-spacing: .08em;
-  text-shadow: none;
   transition: transform .15s ease, background .2s ease, border-color .2s ease;
 }
 
-.btn:hover{
+.btnLink:hover, .btn:hover{
   transform: translateY(-1px);
   background: rgba(255,215,154,.18);
   border-color: rgba(255,215,154,.55);
   color: #fff;
 }
 
-/* =========================
-   FORMS (Prayer Requests)
-========================= */
-
-label{
-  display:block;
-  margin: 14px 0 8px;
-  color: var(--muted);
-  text-shadow: 0 10px 34px var(--shadow);
+/* Reflection text */
+.prose{
+  padding: 18px 18px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.14);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(2px);
 }
 
-input, textarea{
-  width: 100%;
+.prose p{
+  margin-bottom: 18px;
+  font-size: 1.07rem;
+  text-shadow:0 10px 30px var(--shadow);
+}
+
+.adminLink{
+  margin-top: 12px;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: .9rem;
+}
+
+.adminLink a{
+  color: rgba(255,215,154,.9);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,215,154,.35);
+}
+
+.adminLink a:hover{
+  border-bottom-color: rgba(255,215,154,.8);
+}
+
+/* Form */
+.form{
+  margin-top: 10px;
+  padding: 18px 18px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.14);
+  border: 1px solid rgba(255,255,255,.10);
+  backdrop-filter: blur(2px);
+}
+
+.label{
+  display:block;
+  margin: 12px 0 8px;
+  color: var(--muted);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: .9rem;
+  letter-spacing:.03em;
+}
+
+.field{
+  width:100%;
   padding: 14px 14px;
   border-radius: 12px;
   background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.18);
   color: var(--cream);
-  font-family: inherit;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-size: 1rem;
 }
 
-textarea{
-  min-height: 130px;
+textarea.field{
+  min-height: 140px;
   resize: vertical;
 }
 
-input:focus, textarea:focus{
-  outline: none;
+.field:focus{
+  outline:none;
   border-color: rgba(255,215,154,.60);
 }
 
-button{
-  margin-top: 20px;
-  padding: 14px 26px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  letter-spacing: .12em;
-  background: linear-gradient(135deg,#ffd79a,#ffb86b);
-  color: #24160c;
-}
+.hp{display:none}
 
-button:hover{opacity:.92}
-
-/* =========================
-   FOOTER
-========================= */
-
+/* Footer */
 .footer{
-  margin-top: 92px;
-  text-align: center;
-  color: var(--muted);
-  font-size: .92rem;
-  text-shadow: 0 10px 34px var(--shadow);
+  margin-top: 90px;
+  text-align:center;
+  color: rgba(247,243,234,.60);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: .9rem;
 }
-
-/* =========================
-   LINKS (if any remain)
-========================= */
-
-a.link{
-  color: var(--gold);
-  text-decoration: none;
-}
-a.link:hover{ text-decoration: underline; }
