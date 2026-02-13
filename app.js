@@ -51,6 +51,9 @@
 
       container.innerHTML = "";
 
+      const usccbUrl = data.source || "https://bible.usccb.org/daily-bible-reading";
+      const laudateUrl = "https://laudateapp.com/";
+
       (data.items || []).forEach((item) => {
         const div = document.createElement("div");
         div.className = "reading";
@@ -58,12 +61,23 @@
           <div class="reading__source">${esc(item.kind || "")}</div>
           <div class="reading__title">${esc(item.reference || "")}</div>
           ${item.excerpt ? `<p class="reading__snippet">${esc(item.excerpt)}</p>` : ""}
+
+          <div class="reading__actions">
+            <a class="btn btn--ghost" href="${usccbUrl}" target="_blank" rel="noreferrer">Open full on USCCB</a>
+            <a class="btn btn--ghost" href="${laudateUrl}" target="_blank" rel="noreferrer">Open Laudate</a>
+          </div>
         `;
         container.appendChild(div);
       });
 
       if (!data.items || data.items.length === 0) {
-        container.innerHTML = `<p class="lead">Could not load today’s readings. Please use the USCCB link below.</p>`;
+        container.innerHTML = `
+          <p class="lead">Could not load today’s readings. Please use the links below.</p>
+          <div class="reading__actions">
+            <a class="btn btn--ghost" href="https://bible.usccb.org/daily-bible-reading" target="_blank" rel="noreferrer">Open full on USCCB</a>
+            <a class="btn btn--ghost" href="https://laudateapp.com/" target="_blank" rel="noreferrer">Open Laudate</a>
+          </div>
+        `;
       }
     } catch (e) {
       console.error(e);
