@@ -27,7 +27,7 @@ body{
 }
 .crossOverlay{
   position: fixed;
-  top: 10px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
   width: min(560px, 82vw);
@@ -38,9 +38,17 @@ body{
   filter: blur(1.2px) saturate(1.08) brightness(1.08);
 
   /* soften edges so it dissolves into the scene */
-  -webkit-mask-image: radial-gradient(circle at 50% 55%, rgba(0,0,0,1) 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.35) 62%, rgba(0,0,0,0) 78%);
-  mask-image: radial-gradient(circle at 50% 55%, rgba(0,0,0,1) 0%, rgba(0,0,0,.85) 35%, rgba(0,0,0,.35) 62%, rgba(0,0,0,0) 78%);
+   -webkit-mask-image: radial-gradient(circle at 50% 55%,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,.92) 45%,
+    rgba(0,0,0,.55) 75%,
+    rgba(0,0,0,0) 92%);
 
+  mask-image: radial-gradient(circle at 50% 55%,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,.92) 45%,
+    rgba(0,0,0,.55) 75%,
+    rgba(0,0,0,0) 92%);
   pointer-events: none;
   z-index: -1;
 }
