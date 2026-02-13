@@ -47,12 +47,11 @@
       const data = await res.json();
 
       if (dateEl) dateEl.textContent = data.dateLabel || "Today";
-      if (introEl) introEl.textContent = data.summary || "Today’s Catholic liturgy readings (NABRE).";
+      if (introEl) introEl.textContent = ""; // remove the extra line entirely
 
       container.innerHTML = "";
 
       const usccbUrl = data.source || "https://bible.usccb.org/daily-bible-reading";
-      const laudateUrl = "https://laudateapp.com/";
 
       (data.items || []).forEach((item) => {
         const div = document.createElement("div");
@@ -61,29 +60,28 @@
           <div class="reading__source">${esc(item.kind || "")}</div>
           <div class="reading__title">${esc(item.reference || "")}</div>
           ${item.excerpt ? `<p class="reading__snippet">${esc(item.excerpt)}</p>` : ""}
-
-          <div class="reading__actions">
-            <a class="btn btn--ghost" href="${usccbUrl}" target="_blank" rel="noreferrer">Open full on USCCB</a>
-            <a class="btn btn--ghost" href="${laudateUrl}" target="_blank" rel="noreferrer">Open Laudate</a>
-          </div>
         `;
         container.appendChild(div);
       });
 
-      if (!data.items || data.items.length === 0) {
-        container.innerHTML = `
-          <p class="lead">Could not load today’s readings. Please use the links below.</p>
-          <div class="reading__actions">
-            <a class="btn btn--ghost" href="https://bible.usccb.org/daily-bible-reading" target="_blank" rel="noreferrer">Open full on USCCB</a>
-            <a class="btn btn--ghost" href="https://laudateapp.com/" target="_blank" rel="noreferrer">Open Laudate</a>
-          </div>
-        `;
-      }
+      // Single button, once, after all readings
+      const actions = document.createElement("div");
+      actions.className = "reading__actions";
+      actions.innerHTML = `
+        <a class="btn" href="${usccbUrl}" target="_blank" rel="noreferrer">Open full readings on USCCB</a>
+      `;
+      container.appendChild(actions);
+
     } catch (e) {
       console.error(e);
       if (dateEl) dateEl.textContent = "—";
-      if (introEl) introEl.textContent = "Could not load readings right now.";
-      container.innerHTML = `<p class="lead">Please use the USCCB link below.</p>`;
+      if (introEl) introEl.textContent = "";
+      container.innerHTML = `
+        <p class="lead">Readings are temporarily unavailable.</p>
+        <div class="reading__actions">
+          <a class="btn" href="https://bible.usccb.org/daily-bible-reading" target="_blank" rel="noreferrer">Open full readings on USCCB</a>
+        </div>
+      `;
     }
   }
 
