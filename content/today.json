@@ -1,5 +1,28 @@
-{
-  "opening": "Lord, meet us gently today and always",
-  "body": "When Ahijah tore his new cloak into twelve pieces, he was revealing more than political division—he was unveiling God’s sovereign plan. Ten tribes were given to Jeroboam, forming the northern kingdom, separated from the Davidic promise. Two tribes—Judah and Benjamin—remained with the house of David.\n\nThe northern kingdom fell in 722 BC. Judah followed in 586 BC. From a human perspective, it looked like the covenant had failed.\n\nBut God had already written the next chapter.\n\nIn Isaiah 44:28, long before Babylon fell, God named Cyrus—calling him “my shepherd.” Nearly 150 years before his birth, the Lord declared that Cyrus would fulfill His purpose.\n\nGod was not reacting to history. He was governing it.\n\nEven pagan rulers serve His plan. Even exile serves redemption. Even collapse precedes restoration.\n\nThis is the astonishing faithfulness of God.\n\nThe power of this passage isn’t just that God predicts history — it’s that He rules it.",
-  "prayer": "Jesus, I trust in You."
-}
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets"
+public_folder: "/assets"
+
+collections:
+  - name: "reflection"
+    label: "Daily Reflection"
+    files:
+      - file: "content/today.json"
+        label: "Today"
+        name: "today"
+        fields:
+          - label: "Opening"
+            name: "opening"
+            widget: "string"
+            required: false
+
+          - label: "Reflection"
+            name: "body"
+            widget: "text"
+
+          - label: "Closing Prayer"
+            name: "prayer"
+            widget: "string"
+            required: false
