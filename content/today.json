@@ -1,28 +1,5 @@
-backend:
-  name: git-gateway
-  branch: main
-
-media_folder: "assets"
-public_folder: "/assets"
-
-collections:
-  - name: "reflection"
-    label: "Daily Reflection"
-    files:
-      - file: "content/today.json"
-        label: "Today"
-        name: "today"
-        fields:
-          - label: "Opening"
-            name: "opening"
-            widget: "string"
-            required: false
-
-          - label: "Reflection"
-            name: "body"
-            widget: "text"
-
-          - label: "Closing Prayer"
-            name: "prayer"
-            widget: "string"
-            required: false
+{
+  "opening": "Lord, meet us gently today and always",
+  "prayer": "Jesus, I trust in You.",
+  "body": "Today Jesus speaks the Aramaic word \"Ephphatha\" today.   The word means \"Be opened!\"  He says it while looking up to heaven, sighing, and touching the man's ears and tongue.    Immediately his ears are opened, his tongue freed, and speaking.  \n\nHow does this speak to us:  Humanity today suffers from deafness to God's voice, and inability to speak God's truth.   He comes to open ears to hear truth, Hearts to understand, and mouths to proclaim God's praise.  \n\n\"Ephphatha\" becomes a summary of Christ's mission: To open what sin has closed. \n\nKnow and understand. Christ still speaks \"Ephphatha\" today.  Over hardened hearts, wounded minds, our lives.  Those who feel stuck in silence, fear, or confusion. \n\nHe opens what we cannot open ourselves.  God speaks -- and things change. "
+}
