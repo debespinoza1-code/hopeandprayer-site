@@ -2,18 +2,17 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
+media_folder: "assets"
+public_folder: "/assets"
 
 collections:
-  - name: "reflections"
-    label: "Reflections"
-    folder: "content"
-    create: false
-    slug: "today"
-    extension: "json"
-    format: "json"
-    fields:
-      - { label: "Opening", name: "opening", widget: "string" }
-      - { label: "Body", name: "body", widget: "text" }
-      - { label: "Prayer", name: "prayer", widget: "string", required: false }
+  - name: "reflection"
+    label: "Daily Reflection"
+    files:
+      - file: "content/today.json"
+        label: "Today"
+        name: "today"
+        fields:
+          - label: "Reflection"
+            name: "body"
+            widget: "text"
