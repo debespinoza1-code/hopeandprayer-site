@@ -1,123 +1,192 @@
-body{
-margin:0;
-font-family:'Lora', serif;
-color:#f4f1ea;
-background:#000;
-line-height:1.85;
-font-size:18px;
-}
-main, section, #reflectionContainer, #readingsContainer{
-  font-size: 1.18rem;
-  font-weight: 500;
-}
-body, h1, h2, p, div, label{
-  text-shadow: 0 2px 10px rgba(0,0,0,.75);
-}
-/* Background Image */
-.bg{
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-z-index:-1;
-background:
-linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.85)),
-url("assets/background.jpg") center/contain no-repeat;
+/* --------------------
+   RESET
+---------------------*/
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-/* Hero */
+html,body{
+  height:100%;
+}
+
+/* --------------------
+   BASE
+---------------------*/
+
+body{
+  font-family:'Lora', serif;
+  background:#000;
+  color:#f4f1ea;
+  line-height:1.9;
+  font-size:18px;
+}
+
+/* --------------------
+   BACKGROUND IMAGE
+---------------------*/
+
+.bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background:
+    linear-gradient(
+      rgba(0,0,0,.70),
+      rgba(0,0,0,.85)
+    ),
+    url("assets/background.jpg") center/contain no-repeat;
+}
+
+/* --------------------
+   HERO
+---------------------*/
+
 .hero{
-min-height:70vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
+  min-height:70vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px 20px;
 }
 
 .hero h1{
-font-size:4rem;
-letter-spacing:.3em;
-color:#ffd79a;
-margin:0;
+  font-size:4rem;
+  letter-spacing:.25em;
+  color:#ffd79a;
+  margin-bottom:14px;
 }
 
 .hero p{
-font-style:italic;
-opacity:.85;
+  font-style:italic;
+  color:rgba(244,241,234,.75);
 }
 
-/* Main Content */
+/* --------------------
+   MAIN CONTENT
+---------------------*/
+
 main{
-max-width:800px;
-margin:auto;
-padding:30px 20px;
+  max-width:760px;
+  margin:0 auto;
+  padding:20px 20px 90px;
 }
+
+/* --------------------
+   SECTIONS
+---------------------*/
 
 section{
-margin-bottom:80px;
+  margin-top:80px;
 }
 
 h2{
-color:#ffd79a;
-margin-bottom:20px;
+  color:#ffd79a;
+  font-size:1.9rem;
+  margin-bottom:22px;
 }
 
-/* Readings */
+/* --------------------
+   READINGS
+---------------------*/
+
 .reading{
-margin-bottom:25px;
+  margin-bottom:36px;
 }
 
 .kind{
-text-transform:uppercase;
-letter-spacing:.1em;
-font-size:.8rem;
-opacity:.8;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:.75rem;
+  color:rgba(244,241,234,.6);
 }
 
 .ref{
-color:#ffd79a;
-margin:6px 0;
+  color:#ffd79a;
+  margin:8px 0 6px;
+  font-size:1.1rem;
 }
 
 .excerpt{
-opacity:.95;
+  max-width:680px;
 }
 
-/* Buttons */
-a,button{
-color:#ffd79a;
-background:none;
-border:1px solid #ffd79a;
-padding:10px 18px;
-border-radius:999px;
-text-decoration:none;
+/* --------------------
+   REFLECTION
+---------------------*/
+
+#reflectionContainer{
+  max-width:680px;
+  margin:0 auto;
+  background:rgba(0,0,0,.55);
+  padding:32px 30px;
+  border-radius:14px;
 }
 
-button{
-cursor:pointer;
-background:#ffd79a;
-color:#000;
-border:none;
-margin-top:10px;
+#reflectionContainer p{
+  margin-bottom:22px;
+  line-height:2;
 }
 
-/* Inputs */
-input,textarea{
-width:100%;
-padding:12px;
-margin-top:6px;
-margin-bottom:12px;
-background:#111;
-border:1px solid #555;
-color:#fff;
-border-radius:6px;
+/* --------------------
+   LINKS / BUTTONS
+---------------------*/
+
+a{
+  color:#ffd79a;
+  text-decoration:none;
 }
 
-/* Footer */
+a:hover{
+  text-decoration:underline;
+}
+
+a.button, button{
+  display:inline-block;
+  margin-top:18px;
+  padding:12px 22px;
+  border-radius:999px;
+  background:#ffd79a;
+  color:#000;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* --------------------
+   FORMS
+---------------------*/
+
+label{
+  display:block;
+  margin:18px 0 6px;
+  color:rgba(244,241,234,.75);
+}
+
+input, textarea{
+  width:100%;
+  padding:12px;
+  border-radius:6px;
+  background:#111;
+  border:1px solid #555;
+  color:#fff;
+  font-family:'Lora', serif;
+  font-size:1rem;
+}
+
+textarea{
+  min-height:140px;
+}
+
+/* --------------------
+   FOOTER
+---------------------*/
+
 footer{
-text-align:center;
-opacity:.6;
+  margin-top:120px;
+  text-align:center;
+  color:rgba(244,241,234,.55);
 }
