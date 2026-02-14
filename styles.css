@@ -1,9 +1,10 @@
 body{
 margin:0;
-font-family:'Playfair Display','Cormorant Garamond',serif;
-color:#f7f3ea;
+font-family:'Lora', serif;
+color:#f4f1ea;
 background:#000;
-line-height:1.7;
+line-height:1.85;
+font-size:18px;
 }
 main, section, #reflectionContainer, #readingsContainer{
   font-size: 1.18rem;
