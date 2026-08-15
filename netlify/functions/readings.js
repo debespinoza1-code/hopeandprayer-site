@@ -80,12 +80,22 @@ exports.handler = async function () {
       }),
     };
   } catch (e) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
-      body: JSON.stringify({ error: "Unexpected error", detail: String(e) }),
-    };
-  }
+  const { dateLabel } = usccbToday();
+
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store"
+    },
+    body: JSON.stringify({
+      dateLabel,
+      summary: "Today's Catholic liturgy readings.",
+      items: [],
+      source: "https://bible.usccb.org/daily-bible-reading"
+    })
+  };
+}
 };
 async function followMassDuringDayIfPresent(url, html) {
   const dayUrl = url.replace(/\.cfm$/i, "-Day");
