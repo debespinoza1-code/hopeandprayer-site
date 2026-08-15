@@ -13,13 +13,29 @@ exports.handler = async function () {
     // If for some reason today's computed URL fails, fallback to the landing page discovery
     let finalUrl = readingsUrl;
     let readingsHtml = "";
-    if (readingsRes.ok) {
-      readingsHtml = await readingsRes.text();
-    } else {
-      const fallback = await fallbackFromLanding();
-      finalUrl = fallback.finalUrl;
-      readingsHtml = fallback.readingsHtml;
-    }
+   if (readingsRes.ok) {
+  readingsHtml = await readingsRes.text();
+
+  const followed = await followMassDuringDayIfPresent(
+    finalUrl,
+    readingsHtml
+  );
+
+  finalUrl = followed.finalUrl;
+  readingsHtml = followed.readingsHtml;
+} else {
+  const fallback = await fallbackFromLanding();
+  finalUrl = fallback.finalUrl;
+  readingsHtml = fallback.readingsHtml;
+
+  const followed = await followMassDuringDayIfPresent(
+    finalUrl,
+    readingsHtml
+  );
+
+  finalUrl = followed.finalUrl;
+  readingsHtml = followed.readingsHtml;
+}
 
     const sections = [
       { label: "Reading I", variants: ["Reading I", "Reading 1"] },
@@ -71,7 +87,33 @@ exports.handler = async function () {
     };
   }
 };
+async function followMassDuringDayIfPresent(url, html) {
+  const dayPath =
+    pick(html, /href="(\/bible\/readings\/[^"]+)"[^>]*>\s*Mass during the Day\s*<\/a>/i) ||
+    pick(html, /href="(\/bible\/readings\/[^"]+)"[^>]*>[\s\S]*?Mass during the Day[\s\S]*?<\/a>/i);
 
+  if (!dayPath) {
+    return { finalUrl: url, readingsHtml: html };
+  }
+
+  const finalUrl = "https://bible.usccb.org" + dayPath;
+
+  const res = await fetch(finalUrl, {
+    headers: {
+      "User-Agent": "HopeSiteBot/1.0",
+      "Accept": "text/html"
+    }
+  });
+
+  if (!res.ok) {
+    return { finalUrl: url, readingsHtml: html };
+  }
+
+  return {
+    finalUrl,
+    readingsHtml: await res.text()
+  };
+}
 async function fallbackFromLanding() {
   const landingUrl = "https://bible.usccb.org/daily-bible-reading";
   const landingRes = await fetch(landingUrl, {
