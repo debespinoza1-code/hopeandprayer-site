@@ -164,13 +164,16 @@ function usccbToday() {
 
 function extractSectionByAnyHeading(html, variants) {
   for (const v of variants) {
-    const headingRe = new RegExp(`<h3[^>]*>[\\s\\S]*?${escapeRe(v)}[\\s\\S]*?<\\/h3>`, "i");
+    const headingRe = new RegExp(
+  `<h[2-4][^>]*>[\\s\\S]*?${escapeRe(v)}[\\s\\S]*?<\\/h[2-4]>`,
+  "i"
+);<\\/h3>`, "i");
     const m = headingRe.exec(html);
     if (!m) continue;
 
     const start = m.index + m[0].length;
     const tail = html.slice(start);
-    const next = tail.search(/<h3\b/i);
+    const next = tail.search(/<h[2-4]\b/i);
     return next >= 0 ? tail.slice(0, next) : tail.slice(0, 15000);
   }
   return "";
