@@ -77,11 +77,23 @@ async function loadReflection() {
   if (!box) return;
 
   try {
-    const res = await fetch("/content/today.json", { cache: "no-store" });
+    const path = window.location.pathname;
+let reflectionFile = "/content/today.json";
+
+if (path.startsWith("/reflections/")) {
+  const slug = path.split("/reflections/")[1].replace(/\/$/, "");
+  if (slug) {
+    reflectionFile = `/content/reflections/${slug}.json`;
+  }
+}
+
+const res = await fetch(reflectionFile, { cache: "no-store" });
     if (!res.ok) throw new Error("Reflection request failed: " + res.status);
 
     const data = await res.json();
-
+if (data.title) {
+  document.title = `${data.title} | Hope & Prayer`;
+}
     const opening = data.opening ? `<p><em>${escapeHtml(data.opening)}</em></p>` : "";
     const body = textToParagraphs(data.body || "");
     const prayer = data.prayer ? `<p><strong>Prayer:</strong> ${escapeHtml(data.prayer)}</p>` : "";
