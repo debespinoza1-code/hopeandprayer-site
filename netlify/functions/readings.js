@@ -167,7 +167,7 @@ function extractSectionByAnyHeading(html, variants) {
     const headingRe = new RegExp(
   `<h[2-4][^>]*>[\\s\\S]*?${escapeRe(v)}[\\s\\S]*?<\\/h[2-4]>`,
   "i"
-);<\\/h3>`, "i");
+);
     const m = headingRe.exec(html);
     if (!m) continue;
 
