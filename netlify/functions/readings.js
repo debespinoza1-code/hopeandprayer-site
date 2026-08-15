@@ -88,18 +88,13 @@ exports.handler = async function () {
   }
 };
 async function followMassDuringDayIfPresent(url, html) {
-const dayPath = pick(
-  html,
-  /href="(\/bible\/readings\/[^"]+-Day)"/i
-);
+  const dayUrl = url.replace(/\.cfm$/i, "-Day");
 
-  if (!dayPath) {
+  if (dayUrl === url) {
     return { finalUrl: url, readingsHtml: html };
   }
 
-  const finalUrl = "https://bible.usccb.org" + dayPath;
-
-  const res = await fetch(finalUrl, {
+  const res = await fetch(dayUrl, {
     headers: {
       "User-Agent": "HopeSiteBot/1.0",
       "Accept": "text/html"
@@ -110,9 +105,16 @@ const dayPath = pick(
     return { finalUrl: url, readingsHtml: html };
   }
 
+  const dayHtml = await res.text();
+
+  // Only use the -Day page if it actually contains Mass readings.
+  if (!/Reading\s*(I|1)/i.test(dayHtml) || !/Gospel/i.test(dayHtml)) {
+    return { finalUrl: url, readingsHtml: html };
+  }
+
   return {
-    finalUrl,
-    readingsHtml: await res.text()
+    finalUrl: dayUrl,
+    readingsHtml: dayHtml
   };
 }
 async function fallbackFromLanding() {
