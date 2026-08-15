@@ -16,3 +16,32 @@ collections:
           - label: "Reflection"
             name: "body"
             widget: "text"
+  - name: "reflection_library"
+    label: "Reflection Library"
+    folder: "content/reflections"
+    create: true
+    extension: "json"
+    format: "json"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "reflections/{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - label: "Title"
+        name: "title"
+        widget: "string"
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        date_format: "MMMM D, YYYY"
+        time_format: false
+      - label: "Opening"
+        name: "opening"
+        widget: "string"
+        required: false
+      - label: "Reflection"
+        name: "body"
+        widget: "text"
+      - label: "Prayer"
+        name: "prayer"
+        widget: "string"
+        required: false
