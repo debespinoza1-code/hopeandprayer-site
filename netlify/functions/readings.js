@@ -88,9 +88,10 @@ exports.handler = async function () {
   }
 };
 async function followMassDuringDayIfPresent(url, html) {
-  const dayPath =
-    pick(html, /href="(\/bible\/readings\/[^"]+)"[^>]*>\s*Mass during the Day\s*<\/a>/i) ||
-    pick(html, /href="(\/bible\/readings\/[^"]+)"[^>]*>[\s\S]*?Mass during the Day[\s\S]*?<\/a>/i);
+const dayPath = pick(
+  html,
+  /href="(\/bible\/readings\/[^"]+-Day)"/i
+);
 
   if (!dayPath) {
     return { finalUrl: url, readingsHtml: html };
