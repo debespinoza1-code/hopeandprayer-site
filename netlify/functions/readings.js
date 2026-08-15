@@ -102,15 +102,14 @@ async function followMassDuringDayIfPresent(url, html) {
   });
 
   if (!res.ok) {
-    return { finalUrl: url, readingsHtml: html };
-  }
-
+  throw new Error(`Mass during Day fetch failed: ${res.status} ${dayUrl}`);
+}
   const dayHtml = await res.text();
 
   // Only use the -Day page if it actually contains Mass readings.
-  if (!/Reading\s*(I|1)/i.test(dayHtml) || !/Gospel/i.test(dayHtml)) {
-    return { finalUrl: url, readingsHtml: html };
-  }
+ if (!/Reading\s*(I|1)/i.test(dayHtml) || !/Gospel/i.test(dayHtml)) {
+  throw new Error(`Mass during Day page loaded but readings were not detected: ${dayUrl}`);
+}
 
   return {
     finalUrl: dayUrl,
