@@ -1,68 +1,53 @@
 exports.handler = async function () {
   try {
-    // Build today's USCCB readings URL using USCCB timezone (America/New_York)
     const { mmddyy, dateLabel } = usccbToday();
 
-    // Example: https://bible.usccb.org/bible/readings/021226.cfm
-    const readingsUrl = `https://bible.usccb.org/bible/readings/${mmddyy}.cfm`;
+    const normalUrl = `https://bible.usccb.org/bible/readings/${mmddyy}.cfm`;
 
-    const readingsRes = await fetch(readingsUrl, {
-      headers: { "User-Agent": "HopeSiteBot/1.0", "Accept": "text/html" },
+    let finalUrl = normalUrl;
+    let readingsHtml = "";
+
+    // First try the normal USCCB daily readings page
+    const normalRes = await fetch(normalUrl, {
+      headers: {
+        "User-Agent": "HopeSiteBot/1.0",
+        "Accept": "text/html"
+      }
     });
 
-    // If for some reason today's computed URL fails, fallback to the landing page discovery
-    let finalUrl = readingsUrl;
-    let readingsHtml = "";
-   if (readingsRes.ok) {
-  readingsHtml = await readingsRes.text();
+    if (normalRes.ok) {
+      readingsHtml = await normalRes.text();
+    }
 
-  const followed = await followMassDuringDayIfPresent(
-    finalUrl,
-    readingsHtml
-  );
+    // Try to parse the normal page
+    let items = parseReadings(readingsHtml);
 
-  finalUrl = followed.finalUrl;
-  readingsHtml = followed.readingsHtml;
-} else {
-  const fallback = await fallbackFromLanding();
-  finalUrl = fallback.finalUrl;
-  readingsHtml = fallback.readingsHtml;
+    // Some solemnities/feasts use a separate "-Day" page.
+    // Only try it if the normal page did not give us readings.
+    if (items.length === 0) {
+      const dayUrl = normalUrl.replace(/\.cfm$/i, "-Day");
 
-  const followed = await followMassDuringDayIfPresent(
-    finalUrl,
-    readingsHtml
-  );
+      try {
+        const dayRes = await fetch(dayUrl, {
+          headers: {
+            "User-Agent": "HopeSiteBot/1.0",
+            "Accept": "text/html"
+          }
+        });
 
-  finalUrl = followed.finalUrl;
-  readingsHtml = followed.readingsHtml;
-}
+        if (dayRes.ok) {
+          const dayHtml = await dayRes.text();
+          const dayItems = parseReadings(dayHtml);
 
-    const sections = [
-      { label: "Reading I", variants: ["Reading I", "Reading 1"] },
-      { label: "Reading II", variants: ["Reading II", "Reading 2"] },
-      { label: "Responsorial Psalm", variants: ["Responsorial Psalm"] },
-      { label: "Gospel", variants: ["Gospel"] },
-    ];
-
-    const items = [];
-
-    for (const sec of sections) {
-      const block = extractSectionByAnyHeading(readingsHtml, sec.variants);
-      if (!block) continue;
-
-      const paraHtml = pick(block, /<p[^>]*>([\s\S]*?)<\/p>/i);
-      const paraText = clean(strip(paraHtml));
-      const excerpt = paraText
-        ? paraText.slice(0, 320) + (paraText.length > 320 ? "…" : "")
-        : "";
-
-      const reference =
-        clean(pick(block, /<a[^>]*href="\/bible\/(?!readings\/)[^"]*"[^>]*>([\s\S]*?)<\/a>/i)) ||
-        findCitation(clean(strip(block))) ||
-        "";
-
-      if (reference || excerpt) {
-        items.push({ kind: sec.label, reference, excerpt });
+          if (dayItems.length > 0) {
+            finalUrl = dayUrl;
+            readingsHtml = dayHtml;
+            items = dayItems;
+          }
+        }
+      } catch (e) {
+        // A missing or blocked -Day page is not fatal.
+        console.log("No usable Mass-during-the-Day page:", String(e));
       }
     }
 
@@ -70,91 +55,181 @@ exports.handler = async function () {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "no-store", // critical: prevents Netlify/edge caching yesterday
+        "Cache-Control": "no-store"
       },
       body: JSON.stringify({
         dateLabel,
-        summary: "Today’s Catholic liturgy readings (NABRE).",
+        summary: "Today's Catholic liturgy readings (NABRE).",
         items,
-        source: finalUrl,
-      }),
+        source: finalUrl
+      })
     };
+
   } catch (e) {
-  const { dateLabel } = usccbToday();
+    // Never crash the homepage just because USCCB cannot be reached.
+    const { dateLabel } = usccbToday();
 
-  return {
-    statusCode: 200,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
-    },
-    body: JSON.stringify({
-      dateLabel,
-      summary: "Today's Catholic liturgy readings.",
-      items: [],
-      source: "https://bible.usccb.org/daily-bible-reading"
-    })
-  };
-}
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store"
+      },
+      body: JSON.stringify({
+        dateLabel,
+        summary: "Today's Catholic liturgy readings.",
+        items: [],
+        source: "https://bible.usccb.org/daily-bible-reading"
+      })
+    };
+  }
 };
-async function followMassDuringDayIfPresent(url, html) {
-  const dayUrl = url.replace(/\.cfm$/i, "-Day");
 
-  if (dayUrl === url) {
-    return { finalUrl: url, readingsHtml: html };
+
+// --------------------------------------------------
+// Parse the USCCB readings page
+// --------------------------------------------------
+
+function parseReadings(html) {
+  if (!html) return [];
+
+  const sections = [
+    {
+      label: "Reading I",
+      variants: ["Reading I", "Reading 1"]
+    },
+    {
+      label: "Responsorial Psalm",
+      variants: ["Responsorial Psalm"]
+    },
+    {
+      label: "Reading II",
+      variants: ["Reading II", "Reading 2"]
+    },
+    {
+      label: "Gospel",
+      variants: ["Gospel"]
+    }
+  ];
+
+  const items = [];
+
+  for (const sec of sections) {
+    const block = extractSectionByAnyHeading(html, sec.variants);
+
+    if (!block) continue;
+
+    const reference = extractReference(block);
+    const excerpt = extractExcerpt(block);
+
+    if (reference || excerpt) {
+      items.push({
+        kind: sec.label,
+        reference,
+        excerpt
+      });
+    }
   }
 
-  const res = await fetch(dayUrl, {
-    headers: {
-      "User-Agent": "HopeSiteBot/1.0",
-      "Accept": "text/html"
+  return items;
+}
+
+
+// --------------------------------------------------
+// Find the section beneath a reading heading
+// --------------------------------------------------
+
+function extractSectionByAnyHeading(html, variants) {
+  for (const v of variants) {
+    const headingRe = new RegExp(
+      `<h[1-6][^>]*>[\\s\\S]*?${escapeRe(v)}[\\s\\S]*?<\\/h[1-6]>`,
+      "i"
+    );
+
+    const match = headingRe.exec(html);
+
+    if (!match) continue;
+
+    const start = match.index + match[0].length;
+    const tail = html.slice(start);
+
+    const nextHeading = tail.search(/<h[1-6]\b/i);
+
+    if (nextHeading >= 0) {
+      return tail.slice(0, nextHeading);
     }
-  });
 
-  if (!res.ok) {
-  throw new Error(`Mass during Day fetch failed: ${res.status} ${dayUrl}`);
-}
-  const dayHtml = await res.text();
+    return tail.slice(0, 20000);
+  }
 
-  // Only use the -Day page if it actually contains Mass readings.
- if (!/Reading\s*(I|1)/i.test(dayHtml) || !/Gospel/i.test(dayHtml)) {
-  throw new Error(`Mass during Day page loaded but readings were not detected: ${dayUrl}`);
+  return "";
 }
 
-  return {
-    finalUrl: dayUrl,
-    readingsHtml: dayHtml
-  };
+
+// --------------------------------------------------
+// Extract scripture reference
+// --------------------------------------------------
+
+function extractReference(block) {
+  // USCCB often places the scripture citation in a link.
+  const linkedReference = pick(
+    block,
+    /<a[^>]*href="\/bible\/[^"]*"[^>]*>([\s\S]*?)<\/a>/i
+  );
+
+  if (linkedReference) {
+    const cleaned = clean(linkedReference);
+
+    if (looksLikeCitation(cleaned)) {
+      return cleaned;
+    }
+  }
+
+  // Fallback: find citation-looking text anywhere in the block.
+  const plain = clean(strip(block));
+  return findCitation(plain);
 }
-async function fallbackFromLanding() {
-  const landingUrl = "https://bible.usccb.org/daily-bible-reading";
-  const landingRes = await fetch(landingUrl, {
-    headers: { "User-Agent": "HopeSiteBot/1.0", "Accept": "text/html" },
-  });
-  if (!landingRes.ok) throw new Error("USCCB landing fetch failed");
 
-  const landingHtml = await landingRes.text();
-  const cfmPath = pick(landingHtml, /href="(\/bible\/readings\/\d+\.cfm)"/i);
-  if (!cfmPath) throw new Error("Could not locate readings .cfm link");
 
-  const finalUrl = "https://bible.usccb.org" + cfmPath;
-  const readingsRes = await fetch(finalUrl, {
-    headers: { "User-Agent": "HopeSiteBot/1.0", "Accept": "text/html" },
-  });
-  if (!readingsRes.ok) throw new Error("USCCB readings page fetch failed");
-  const readingsHtml = await readingsRes.text();
+// --------------------------------------------------
+// Extract a short readable excerpt
+// --------------------------------------------------
 
-  return { finalUrl, readingsHtml };
+function extractExcerpt(block) {
+  const paragraphs = [
+    ...block.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)
+  ];
+
+  for (const match of paragraphs) {
+    const text = clean(match[1]);
+
+    if (!text) continue;
+    if (looksLikeCitation(text)) continue;
+
+    // Ignore obvious navigation / audio text
+    if (/listen|audio|lectionary|read more/i.test(text)) continue;
+
+    return text.length > 360
+      ? text.slice(0, 360).trim() + "..."
+      : text;
+  }
+
+  return "";
 }
+
+
+// --------------------------------------------------
+// Date helpers
+// --------------------------------------------------
 
 function usccbToday() {
-  // USCCB is on Eastern time. Build MMDDYY in America/New_York.
   const now = new Date();
+
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
     year: "2-digit",
     month: "2-digit",
-    day: "2-digit",
+    day: "2-digit"
   }).formatToParts(now);
 
   const mm = parts.find(p => p.type === "month").value;
@@ -166,55 +241,77 @@ function usccbToday() {
     weekday: "long",
     year: "numeric",
     month: "long",
-    day: "numeric",
+    day: "numeric"
   }).format(now);
 
-  return { mmddyy: `${mm}${dd}${yy}`, dateLabel };
+  return {
+    mmddyy: `${mm}${dd}${yy}`,
+    dateLabel
+  };
 }
 
-// ---- parsing helpers ----
 
-function extractSectionByAnyHeading(html, variants) {
-  for (const v of variants) {
-    const headingRe = new RegExp(
-  `<h[2-4][^>]*>[\\s\\S]*?${escapeRe(v)}[\\s\\S]*?<\\/h[2-4]>`,
-  "i"
-);
-    const m = headingRe.exec(html);
-    if (!m) continue;
+// --------------------------------------------------
+// Citation helpers
+// --------------------------------------------------
 
-    const start = m.index + m[0].length;
-    const tail = html.slice(start);
-    const next = tail.search(/<h[2-4]\b/i);
-    return next >= 0 ? tail.slice(0, next) : tail.slice(0, 15000);
-  }
-  return "";
+function looksLikeCitation(text) {
+  if (!text) return false;
+
+  return /^[1-3]?\s*[A-Za-z]{2,15}\s+\d+/i.test(text.trim());
 }
+
 
 function findCitation(text) {
   const patterns = [
-    /\b(?:[1-3]\s)?(?:Gn|Ex|Lv|Nm|Dt|Jos|Jgs|Ru|1\s?Sm|2\s?Sm|1\s?Kgs|2\s?Kgs|1\s?Chr|2\s?Chr|Ezr|Neh|Tb|Jdt|Est|1\s?Mc|2\s?Mc|Jb|Ps|Prv|Eccl|Sg|Wis|Sir|Is|Jer|Lam|Bar|Ez|Dn|Hos|Jl|Am|Ob|Jon|Mi|Na|Hb|Zep|Hg|Zec|Mal|Mt|Mk|Lk|Jn|Acts|Rom|1\s?Cor|2\s?Cor|Gal|Eph|Phil|Col|1\s?Thes|2\s?Thes|1\s?Tm|2\s?Tm|Ti|Phlm|Heb|Jas|1\s?Pt|2\s?Pt|1\s?Jn|2\s?Jn|3\s?Jn|Jude|Rv)\s+\d+:\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*\b/i,
-    /\b(?:[1-3]\s)?(?:Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|1\sSamuel|2\sSamuel|1\sKings|2\sKings|1\sChronicles|2\sChronicles|Ezra|Nehemiah|Tobit|Judith|Esther|1\sMaccabees|2\sMaccabees|Job|Psalm|Psalms|Proverbs|Ecclesiastes|Song of Songs|Wisdom|Sirach|Isaiah|Jeremiah|Lamentations|Baruch|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Matthew|Mark|Luke|John|Acts|Romans|1\sCorinthians|2\sCorinthians|Galatians|Ephesians|Philippians|Colossians|1\sThessalonians|2\sThessalonians|1\sTimothy|2\sTimothy|Titus|Philemon|Hebrews|James|1\sPeter|2\sPeter|1\sJohn|2\sJohn|3\sJohn|Jude|Revelation)\s+\d+:\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*\b/i,
+    /\b(?:1|2|3)?\s?(?:Gn|Ex|Lv|Nm|Dt|Jos|Jgs|Ru|1\s?Sm|2\s?Sm|1\s?Kgs|2\s?Kgs|1\s?Chr|2\s?Chr|Ezr|Neh|Tb|Jdt|Est|1\s?Mc|2\s?Mc|Jb|Ps|Prv|Eccl|Sg|Wis|Sir|Is|Jer|Lam|Bar|Ez|Dn|Hos|Jl|Am|Ob|Jon|Mi|Na|Hb|Zep|Hg|Zec|Mal)\s+\d+(?::\d+)?(?:-\d+)?/i,
+
+    /\b(?:Mt|Mk|Lk|Jn|Acts|Rom|1\s?Cor|2\s?Cor|Gal|Eph|Phil|Col|1\s?Thes|2\s?Thes|1\s?Tm|2\s?Tm|Ti|Phlm|Heb|Jas|1\s?Pt|2\s?Pt|1\s?Jn|2\s?Jn|3\s?Jn|Jude|Rv)\s+\d+(?::\d+)?(?:-\d+)?/i
   ];
+
   for (const re of patterns) {
-    const m = text.match(re);
-    if (m) return m[0].trim();
+    const match = text.match(re);
+
+    if (match) {
+      return match[0].trim();
+    }
   }
+
   return "";
 }
 
+
+// --------------------------------------------------
+// General helpers
+// --------------------------------------------------
+
 function pick(text, re) {
-  const m = re.exec(text);
-  return m ? (m[1] || "") : "";
+  const match = re.exec(text);
+  return match ? (match[1] || "") : "";
 }
-function strip(s) { return String(s || "").replace(/<[^>]+>/g, ""); }
-function clean(s) {
-  return strip(s)
+
+
+function strip(value) {
+  return String(value || "").replace(/<[^>]+>/g, " ");
+}
+
+
+function clean(value) {
+  return strip(value)
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#039;/gi, "'")
+    .replace(/&#39;/gi, "'")
+    .replace(/&ldquo;/gi, '"')
+    .replace(/&rdquo;/gi, '"')
+    .replace(/&lsquo;/gi, "'")
+    .replace(/&rsquo;/gi, "'")
     .replace(/\s+/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
     .trim();
 }
-function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+
+function escapeRe(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
