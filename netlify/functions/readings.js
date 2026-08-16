@@ -66,23 +66,24 @@ exports.handler = async function () {
     };
 
   } catch (e) {
-    // Never crash the homepage just because USCCB cannot be reached.
-    const { dateLabel } = usccbToday();
+  const { dateLabel } = usccbToday();
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "no-store"
-      },
-      body: JSON.stringify({
-        dateLabel,
-        summary: "Today's Catholic liturgy readings.",
-        items: [],
-        source: "https://bible.usccb.org/daily-bible-reading"
-      })
-    };
-  }
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store"
+    },
+    body: JSON.stringify({
+      dateLabel,
+      summary: "Today's Catholic liturgy readings.",
+      items: [],
+      source: "https://bible.usccb.org/daily-bible-reading",
+      DEBUG_ERROR: String(e),
+      DEBUG_STACK: e && e.stack ? e.stack : ""
+    })
+  };
+}
 };
 
 
