@@ -86,7 +86,48 @@ if (path.startsWith("/reflections/")) {
     reflectionFile = `/content/reflections/${slug}.json`;
   }
 }
+const reflectionUrl = window.location.href.split("#")[0];
 
+let metaDescription = document.querySelector('meta[name="description"]');
+if (!metaDescription) {
+  metaDescription = document.createElement("meta");
+  metaDescription.setAttribute("name", "description");
+  document.head.appendChild(metaDescription);
+}
+
+metaDescription.setAttribute(
+  "content",
+  data.body
+    ? data.body.replace(/\s+/g, " ").slice(0, 155)
+    : "Catholic Scripture reflection and prayer from Hope & Prayer."
+);
+
+let canonical = document.querySelector('link[rel="canonical"]');
+if (!canonical) {
+  canonical = document.createElement("link");
+  canonical.setAttribute("rel", "canonical");
+  document.head.appendChild(canonical);
+}
+
+canonical.setAttribute("href", reflectionUrl);
+if (data.title && data.date) {
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": data.title,
+    "datePublished": data.date,
+    "mainEntityOfPage": reflectionUrl,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Hope & Prayer"
+    }
+  };
+
+  const schemaScript = document.createElement("script");
+  schemaScript.type = "application/ld+json";
+  schemaScript.textContent = JSON.stringify(articleSchema);
+  document.head.appendChild(schemaScript);
+}
 const res = await fetch(reflectionFile, { cache: "no-store" });
     if (!res.ok) throw new Error("Reflection request failed: " + res.status);
 
@@ -94,6 +135,7 @@ const res = await fetch(reflectionFile, { cache: "no-store" });
 if (data.title) {
   document.title = `${data.title} | Hope & Prayer`;
 }
+    
     const opening = data.opening ? `<p><em>${escapeHtml(data.opening)}</em></p>` : "";
     const body = textToParagraphs(data.body || "");
     const prayer = data.prayer ? `<p><strong>Prayer:</strong> ${escapeHtml(data.prayer)}</p>` : "";
