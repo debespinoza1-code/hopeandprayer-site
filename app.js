@@ -142,10 +142,10 @@ if (data.title) {
 
     box.innerHTML = opening + body + prayer;
 
-  } catch (err) {
-    console.error(err);
-    box.innerHTML = `<p>No reflection yet.</p>`;
-  }
+ } catch (err) {
+  console.error(err);
+  box.innerHTML = `<p>No reflection yet.</p><p style="font-size:.8rem;">${escapeHtml(String(err))}</p>`;
+}
 }
 
 // ----------------------------
