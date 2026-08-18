@@ -86,6 +86,10 @@ if (path.startsWith("/reflections/")) {
     reflectionFile = `/content/reflections/${slug}.json`;
   }
 }
+const res = await fetch(reflectionFile, { cache: "no-store" });
+    if (!res.ok) throw new Error("Reflection request failed: " + res.status);
+
+    const data = await res.json();
 const reflectionUrl = window.location.href.split("#")[0];
 
 let metaDescription = document.querySelector('meta[name="description"]');
@@ -128,10 +132,7 @@ if (data.title && data.date) {
   schemaScript.textContent = JSON.stringify(articleSchema);
   document.head.appendChild(schemaScript);
 }
-const res = await fetch(reflectionFile, { cache: "no-store" });
-    if (!res.ok) throw new Error("Reflection request failed: " + res.status);
 
-    const data = await res.json();
 if (data.title) {
   document.title = `${data.title} | Hope & Prayer`;
 }
