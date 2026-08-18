@@ -52,19 +52,22 @@ body{
   text-align:center;
   padding:30px 20px;
 }
-
-.hero h1{
-  font-size:2.4rem;
-  line-height:1.15;
-  letter-spacing:.04em;
+.hero{
+  display:block;
+}.hero h1{
+  font-size:4rem;
+  letter-spacing:.25em;
   color:#ffd79a;
   margin-bottom:14px;
-  max-width:760px;
 }
 
 .hero p{
   font-style:italic;
   color:rgba(244,241,234,.75);
+  font-size:1.25rem;
+  max-width:650px;
+  line-height:1.5;
+  margin:0;
 }
 
 /* --------------------
