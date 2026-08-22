@@ -6,16 +6,7 @@ media_folder: "assets"
 public_folder: "/assets"
 
 collections:
-  - name: "reflection"
-    label: "Daily Reflection"
-    files:
-      - file: "content/today.json"
-        label: "Today"
-        name: "today"
-        fields:
-          - label: "Reflection"
-            name: "body"
-            widget: "text"
+
   - name: "reflection_library"
     label: "Reflection Library"
     folder: "content/reflections"
