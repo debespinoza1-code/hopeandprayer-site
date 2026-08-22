@@ -148,11 +148,38 @@ if (data.title) {
   box.innerHTML = `<p>No reflection yet.</p><p style="font-size:.8rem;">${escapeHtml(String(err))}</p>`;
 }
 }
+async function loadReflectionLibrary() {
+  const section = document.getElementById("reflectionLibrary");
+  if (!section) return;
 
+  try {
+    const res = await fetch("/content/reflections/index.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Library request failed: " + res.status);
+
+    const reflections = await res.json();
+
+    section.innerHTML = `<h2>Catholic Reflection Library</h2>`;
+
+    reflections.forEach(item => {
+      const p = document.createElement("p");
+      const link = document.createElement("a");
+
+      link.href = item.url;
+      link.textContent = `${item.date} — ${item.title}`;
+
+      p.appendChild(link);
+      section.appendChild(p);
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
 // ----------------------------
 // Run on page load
 // ----------------------------
 document.addEventListener("DOMContentLoaded", () => {
   loadReadings();
   loadReflection();
+  loadReflectionLibrary();
 });
