@@ -19,7 +19,7 @@ html,body{
 body{
   font-family:'Lora', serif;
   background:#000;
-  color:#f4f1ea;
+ color:#F7F3EA;
   line-height:1.9;
   font-size:18px;
 }
@@ -94,7 +94,7 @@ section{
 }
 
 h2{
-  color:#ffd79a;
+  color:#FFE3A3;
   font-size:1.9rem;
   margin-bottom:22px;
 }
@@ -146,7 +146,7 @@ h2{
 ---------------------*/
 
 a{
-  color:#ffd79a;
+  color:#FFE3A3;
   text-decoration:none;
 }
 
