@@ -128,7 +128,9 @@ if (data.title && data.date) {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": data.title,
-    "datePublished": data.date,
+"description": seoDescription,
+"articleSection": data.theme || "Catholic Reflection",
+"datePublished": data.date,
     "mainEntityOfPage": reflectionUrl,
     "publisher": {
       "@type": "Organization",
