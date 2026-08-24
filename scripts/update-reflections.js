@@ -35,11 +35,15 @@ const newest = reflections[0];
 fs.writeFileSync(
   todayPath,
   JSON.stringify(
-    {
-      opening: newest.opening || "",
-      prayer: newest.prayer || "",
-      body: newest.body || ""
-    },
+   {
+  title: newest.title || "",
+  date: newest.date || "",
+  scripture: newest.scripture || "",
+  theme: newest.theme || "",
+  opening: newest.opening || "",
+  prayer: newest.prayer || "",
+  body: newest.body || ""
+}
     null,
     2
   ) + "\n"
