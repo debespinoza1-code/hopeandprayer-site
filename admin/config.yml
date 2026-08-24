@@ -36,3 +36,13 @@ collections:
         name: "prayer"
         widget: "string"
         required: false
+        
+- label: "Scripture Reference"
+  name: "scripture"
+  widget: "string"
+  required: false
+
+- label: "Theme"
+  name: "theme"
+  widget: "string"
+  required: false
