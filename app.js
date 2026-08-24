@@ -41,7 +41,18 @@ async function loadReadings() {
     if (!res.ok) throw new Error("Readings request failed: " + res.status);
 
     const data = await res.json();
+const seoTitleParts = [];
 
+if (data.scripture) seoTitleParts.push(data.scripture);
+if (data.theme) seoTitleParts.push(data.theme);
+
+const seoTitle = seoTitleParts.length
+  ? `${seoTitleParts.join(" — ")} | Hope & Prayer`
+  : `${data.title || "Catholic Reflection"} | Hope & Prayer`;
+
+const seoDescription = data.theme
+  ? `A Catholic reflection for anyone struggling with faith, seeking God, returning to the Church, or wrestling with ${data.theme}.`
+  : `A Catholic reflection for anyone seeking God, struggling with faith, or finding their way back to the Church.`;
     if (dateEl) dateEl.innerText = data.dateLabel || "Today";
     if (container) container.innerHTML = "";
     if (actions) actions.innerHTML = "";
@@ -99,13 +110,11 @@ if (!metaDescription) {
   document.head.appendChild(metaDescription);
 }
 
-metaDescription.setAttribute(
-  "content",
-  data.body
-    ? data.body.replace(/\s+/g, " ").slice(0, 155)
-    : "Catholic Scripture reflection and prayer from Hope & Prayer."
-);
+const seoDescription = data.theme
+  ? `A Catholic reflection on ${data.theme} for anyone struggling with faith, seeking God, or finding their way back to the Catholic Church.`
+  : "Catholic reflections for anyone struggling with faith, seeking God, or finding their way back to the Catholic Church.";
 
+metaDescription.setAttribute("content", seoDescription);
 let canonical = document.querySelector('link[rel="canonical"]');
 if (!canonical) {
   canonical = document.createElement("link");
