@@ -43,7 +43,7 @@ fs.writeFileSync(
   opening: newest.opening || "",
   prayer: newest.prayer || "",
   body: newest.body || ""
-}
+},
     null,
     2
   ) + "\n"
