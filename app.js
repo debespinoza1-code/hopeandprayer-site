@@ -155,8 +155,23 @@ if (data.title) {
 }
 if (window.location.pathname.startsWith("/reflections/")) {
   const reflectionHeading = box.previousElementSibling;
+
   if (reflectionHeading && reflectionHeading.tagName === "H2") {
-    reflectionHeading.textContent = data.title || "Reflection";
+    let reflectionDate = "";
+
+    if (data.date) {
+      const [year, month, day] = data.date.split("-");
+      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+
+      reflectionDate = localDate.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    reflectionHeading.textContent =
+      `${reflectionDate}${reflectionDate ? " — " : ""}${data.title || "Reflection"}`;
   }
 }
     const opening = data.opening ? `<p><em>${escapeHtml(data.opening)}</em></p>` : "";
