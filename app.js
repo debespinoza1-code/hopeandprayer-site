@@ -110,10 +110,16 @@ if (!metaDescription) {
   document.head.appendChild(metaDescription);
 }
 
-const seoDescription = data.theme
-  ? `A Catholic reflection on ${data.theme} for anyone struggling with faith, seeking God, or finding their way back to the Catholic Church.`
-  : "Catholic reflections for anyone struggling with faith, seeking God, or finding their way back to the Catholic Church.";
+const bodySummary = String(data.body || "")
+  .replace(/\s+/g, " ")
+  .trim()
+  .slice(0, 150);
 
+const seoDescription = data.theme
+  ? `Catholic reflection on ${data.scripture ? data.scripture + ": " : ""}${data.theme}.`
+  : bodySummary
+    ? `${bodySummary}${bodySummary.length >= 150 ? "…" : ""}`
+    : "Catholic reflections on Scripture, prayer, faith, and finding your way back to God.";
 metaDescription.setAttribute("content", seoDescription);
 let canonical = document.querySelector('link[rel="canonical"]');
 if (!canonical) {
