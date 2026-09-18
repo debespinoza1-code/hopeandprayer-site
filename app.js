@@ -196,7 +196,15 @@ async function loadReflectionLibrary() {
 // Run on page load
 // ----------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  loadReadings();
+  const isArchivedReflection = window.location.pathname.startsWith("/reflections/");
+
+  if (!isArchivedReflection) {
+    loadReadings();
+  } else {
+    const readingsSection = document.getElementById("readingsDate")?.parentElement;
+    if (readingsSection) readingsSection.style.display = "none";
+  }
+
   loadReflection();
   loadReflectionLibrary();
 });
