@@ -195,7 +195,15 @@ async function loadReflectionLibrary() {
 
     const reflections = await res.json();
 
-    section.innerHTML = `<h2>Catholic Reflection Library</h2>`;
+  section.innerHTML = `
+  <h2>Catholic Reflection Library</h2>
+  <p class="library-intro">
+    Catholic reflections on Scripture, prayer, faith, and everyday life.
+    These reflections are written for anyone seeking God, struggling with faith,
+    returning to the Catholic Church, or simply looking for hope.
+    Browse the daily reflections below.
+  </p>
+`;
 
     reflections.forEach(item => {
       const p = document.createElement("p");
