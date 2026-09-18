@@ -153,7 +153,12 @@ if (data.title && data.date) {
 if (data.title) {
   document.title = `${data.title} | Hope & Prayer`;
 }
-    
+if (window.location.pathname.startsWith("/reflections/")) {
+  const reflectionHeading = box.previousElementSibling;
+  if (reflectionHeading && reflectionHeading.tagName === "H2") {
+    reflectionHeading.textContent = data.title || "Reflection";
+  }
+}
     const opening = data.opening ? `<p><em>${escapeHtml(data.opening)}</em></p>` : "";
     const body = textToParagraphs(data.body || "");
     const prayer = data.prayer ? `<p><strong>Prayer:</strong> ${escapeHtml(data.prayer)}</p>` : "";
