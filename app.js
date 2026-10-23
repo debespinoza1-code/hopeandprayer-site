@@ -19,7 +19,7 @@ function textToParagraphs(text) {
   const safe = escapeHtml(text || "");
 
   const blocks = safe
-    .split(/\n\s*\n/g)      // split on blank lines
+    .split(/\n\s*\n/g)
     .map(b => b.trim())
     .filter(Boolean);
 
@@ -41,18 +41,16 @@ async function loadReadings() {
     if (!res.ok) throw new Error("Readings request failed: " + res.status);
 
     const data = await res.json();
-const seoTitleParts = [];
+    const seoTitleParts = [];
+    if (data.scripture) seoTitleParts.push(data.scripture);
+    if (data.theme) seoTitleParts.push(data.theme);
+    const seoTitle = seoTitleParts.length
+      ? `${seoTitleParts.join(" — ")} | Hope & Prayer`
+      : `${data.title || "Catholic Reflection"} | Hope & Prayer`;
+    const seoDescription = data.theme
+      ? `A Catholic reflection for anyone struggling with faith, seeking God, returning to the Church, or wrestling with ${data.theme}.`
+      : `A Catholic reflection for anyone seeking God, struggling with faith, or finding their way back to the Church.`;
 
-if (data.scripture) seoTitleParts.push(data.scripture);
-if (data.theme) seoTitleParts.push(data.theme);
-
-const seoTitle = seoTitleParts.length
-  ? `${seoTitleParts.join(" — ")} | Hope & Prayer`
-  : `${data.title || "Catholic Reflection"} | Hope & Prayer`;
-
-const seoDescription = data.theme
-  ? `A Catholic reflection for anyone struggling with faith, seeking God, returning to the Church, or wrestling with ${data.theme}.`
-  : `A Catholic reflection for anyone seeking God, struggling with faith, or finding their way back to the Church.`;
     if (dateEl) dateEl.innerText = data.dateLabel || "Today";
     if (container) container.innerHTML = "";
     if (actions) actions.innerHTML = "";
@@ -65,12 +63,11 @@ const seoDescription = data.theme
         <div class="ref">${escapeHtml(item.reference || "")}</div>
         <div class="excerpt">${escapeHtml(item.excerpt || "")}</div>
       `;
-      container.appendChild(div);
+      if (container) container.appendChild(div);
     });
 
     const usccb = data.source || "https://bible.usccb.org/daily-bible-reading";
-    actions.innerHTML = `<a class="button" href="${usccb}" target="_blank" rel="noreferrer">Open full readings on USCCB</a>`;
-
+    if (actions) actions.innerHTML = `<a class="button" href="${escapeHtml(usccb)}" target="_blank" rel="noreferrer">Open full readings on USCCB</a>`;
   } catch (err) {
     console.error(err);
     if (dateEl) dateEl.innerText = "Today";
@@ -89,102 +86,97 @@ async function loadReflection() {
 
   try {
     const path = window.location.pathname;
-let reflectionFile = "/content/today.json";
+    let reflectionFile = "/content/today.json";
 
-if (path.startsWith("/reflections/")) {
-  const slug = path.split("/reflections/")[1].replace(/\/$/, "");
-  if (slug) {
-    reflectionFile = `/content/reflections/${slug}.json`;
-  }
-}
-const res = await fetch(reflectionFile, { cache: "no-store" });
+    if (path.startsWith("/reflections/")) {
+      const slug = path.split("/reflections/")[1].replace(/\/$/, "");
+      if (slug) reflectionFile = `/content/reflections/${slug}.json`;
+    }
+
+    const res = await fetch(reflectionFile, { cache: "no-store" });
     if (!res.ok) throw new Error("Reflection request failed: " + res.status);
 
     const data = await res.json();
-const reflectionUrl = window.location.href.split("#")[0];
+    const reflectionUrl = window.location.href.split("#")[0];
 
-let metaDescription = document.querySelector('meta[name="description"]');
-if (!metaDescription) {
-  metaDescription = document.createElement("meta");
-  metaDescription.setAttribute("name", "description");
-  document.head.appendChild(metaDescription);
-}
-
-const bodySummary = String(data.body || "")
-  .replace(/\s+/g, " ")
-  .trim()
-  .slice(0, 150);
-
-const seoDescription = data.theme
-  ? `Catholic reflection on ${data.scripture ? data.scripture + ": " : ""}${data.theme}.`
-  : bodySummary
-    ? `${bodySummary}${bodySummary.length >= 150 ? "…" : ""}`
-    : "Catholic reflections on Scripture, prayer, faith, and finding your way back to God.";
-metaDescription.setAttribute("content", seoDescription);
-let canonical = document.querySelector('link[rel="canonical"]');
-if (!canonical) {
-  canonical = document.createElement("link");
-  canonical.setAttribute("rel", "canonical");
-  document.head.appendChild(canonical);
-}
-
-canonical.setAttribute("href", reflectionUrl);
-if (data.title && data.date) {
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": data.title,
-"description": seoDescription,
-"articleSection": data.theme || "Catholic Reflection",
-"datePublished": data.date,
-    "mainEntityOfPage": reflectionUrl,
-    "publisher": {
-      "@type": "Organization",
-      "name": "Hope & Prayer"
-    }
-  };
-
-  const schemaScript = document.createElement("script");
-  schemaScript.type = "application/ld+json";
-  schemaScript.textContent = JSON.stringify(articleSchema);
-  document.head.appendChild(schemaScript);
-}
-
-if (data.title) {
-  document.title = `${data.title} | Hope & Prayer`;
-}
-if (window.location.pathname.startsWith("/reflections/")) {
-  const reflectionHeading = box.previousElementSibling;
-
-  if (reflectionHeading && reflectionHeading.tagName === "H2") {
-    let reflectionDate = "";
-
-    if (data.date) {
-      const [year, month, day] = data.date.split("-");
-      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
-
-      reflectionDate = localDate.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      });
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta");
+      metaDescription.setAttribute("name", "description");
+      document.head.appendChild(metaDescription);
     }
 
-    reflectionHeading.textContent =
-      `${reflectionDate}${reflectionDate ? " — " : ""}${data.title || "Reflection"}`;
-  }
-}
+    const bodySummary = String(data.body || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 150);
+
+    const seoDescription = data.theme
+      ? `Catholic reflection on ${data.scripture ? data.scripture + ": " : ""}${data.theme}.`
+      : bodySummary
+        ? `${bodySummary}${bodySummary.length >= 150 ? "…" : ""}`
+        : "Catholic reflections on Scripture, prayer, faith, and finding your way back to God.";
+
+    metaDescription.setAttribute("content", seoDescription);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", reflectionUrl);
+
+    if (data.title && data.date) {
+      const articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": data.title,
+        "description": seoDescription,
+        "articleSection": data.theme || "Catholic Reflection",
+        "datePublished": data.date,
+        "mainEntityOfPage": reflectionUrl,
+        "publisher": {
+          "@type": "Organization",
+          "name": "Hope & Prayer"
+        }
+      };
+      const schemaScript = document.createElement("script");
+      schemaScript.type = "application/ld+json";
+      schemaScript.textContent = JSON.stringify(articleSchema);
+      document.head.appendChild(schemaScript);
+    }
+
+    if (data.title) document.title = `${data.title} | Hope & Prayer`;
+    if (window.location.pathname.startsWith("/reflections/")) {
+      const reflectionHeading = box.previousElementSibling;
+      if (reflectionHeading && reflectionHeading.tagName === "H2") {
+        let reflectionDate = "";
+        if (data.date) {
+          const [year, month, day] = data.date.split("-");
+          const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+          reflectionDate = localDate.toLocaleDateString("en-US", {
+            month: "long", day: "numeric", year: "numeric"
+          });
+        }
+        reflectionHeading.textContent =
+          `${reflectionDate}${reflectionDate ? " — " : ""}${data.title || "Reflection"}`;
+      }
+    }
+
     const opening = data.opening ? `<p><em>${escapeHtml(data.opening)}</em></p>` : "";
     const body = textToParagraphs(data.body || "");
     const prayer = data.prayer ? `<p><strong>Prayer:</strong> ${escapeHtml(data.prayer)}</p>` : "";
-
     box.innerHTML = opening + body + prayer;
+  } catch (err) {
+    console.error(err);
+    box.innerHTML = `<p>No reflection yet.</p><p style="font-size:.8rem;">${escapeHtml(String(err))}</p>`;
+  }
+}
 
- } catch (err) {
-  console.error(err);
-  box.innerHTML = `<p>No reflection yet.</p><p style="font-size:.8rem;">${escapeHtml(String(err))}</p>`;
-}
-}
+// ----------------------------
+// Load Reflection Library, grouped by month
+// Existing reflection URLs are kept unchanged.
+// ----------------------------
 async function loadReflectionLibrary() {
   const section = document.getElementById("reflectionLibrary");
   if (!section) return;
@@ -194,32 +186,61 @@ async function loadReflectionLibrary() {
     if (!res.ok) throw new Error("Library request failed: " + res.status);
 
     const reflections = await res.json();
+    if (!Array.isArray(reflections)) throw new Error("Reflection index must be an array");
 
-  section.innerHTML = `
-  <h2>Catholic Reflection Library</h2>
-  <p class="library-intro">
-    Catholic reflections on Scripture, prayer, faith, and everyday life.
-    These reflections are written for anyone seeking God, struggling with faith,
-    returning to the Catholic Church, or simply looking for hope.
-    Browse the daily reflections below.
-  </p>
-`;
+    section.innerHTML = `
+      <h2>Catholic Reflection Library</h2>
+      <p class="library-intro">
+        Catholic reflections on Scripture, prayer, faith, and everyday life.
+        These reflections are written for anyone seeking God, struggling with faith,
+        returning to the Catholic Church, or simply looking for hope.
+        Browse the reflections by month below.
+      </p>
+    `;
 
+    const groups = new Map();
     reflections.forEach(item => {
-      const p = document.createElement("p");
-      const link = document.createElement("a");
-
-      link.href = item.url;
-      link.textContent = `${item.date} — ${item.title}`;
-
-      p.appendChild(link);
-      section.appendChild(p);
+      if (!item || typeof item.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(item.date)) return;
+      const monthKey = item.date.slice(0, 7);
+      if (!groups.has(monthKey)) groups.set(monthKey, []);
+      groups.get(monthKey).push(item);
     });
 
+    const sortedMonths = [...groups.keys()].sort().reverse();
+    sortedMonths.forEach((monthKey, index) => {
+      const [year, month] = monthKey.split("-").map(Number);
+      const monthName = new Date(year, month - 1, 1).toLocaleDateString("en-US", {
+        month: "long", year: "numeric"
+      });
+      const items = groups.get(monthKey).sort((a, b) => b.date.localeCompare(a.date));
+
+      const details = document.createElement("details");
+      details.className = "reflection-month";
+      if (index === 0) details.open = true;
+
+      const summary = document.createElement("summary");
+      summary.textContent = `${monthName} (${items.length} ${items.length === 1 ? "reflection" : "reflections"})`;
+      details.appendChild(summary);
+
+      const list = document.createElement("ul");
+      list.className = "reflection-month-list";
+      items.forEach(item => {
+        if (typeof item.url !== "string" || !item.url.trim()) return;
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = item.url; // Preserve the original URL from index.json
+        link.textContent = `${item.date} — ${item.title || "Reflection"}`;
+        li.appendChild(link);
+        list.appendChild(li);
+      });
+      details.appendChild(list);
+      section.appendChild(details);
+    });
   } catch (err) {
     console.error(err);
   }
 }
+
 // ----------------------------
 // Run on page load
 // ----------------------------
